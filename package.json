@@ -1,15 +1,61 @@
 {
   "name": "google-tasks-app",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "index.js",
   "author": "hisomura <hisomura.noreply@gmail.com>",
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "lite-server --baseDir=public"
+    "dev": "webpack serve",
+    "build": "webpack",
+    "test": "jest --maxWorkers=1",
+    "clearCache": "jest --clearCache"
+  },
+  "prettier": {
+    "printWidth": 120
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.4.0",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-icons": "^3.11.0",
+    "react-redux": "^7.2.1",
+    "redux": "^4.0.5",
+    "react-dnd": "^11.1.3",
+    "react-dnd-html5-backend": "^11.1.3",
+    "tailwindcss": "^2.0.1"
   },
   "devDependencies": {
+    "@testing-library/dom": "^7.28.1",
+    "@testing-library/jest-dom": "^5.11.6",
+    "@testing-library/react": "^11.2.2",
+    "@testing-library/react-hooks": "^3.4.2",
+    "@testing-library/user-event": "^12.2.2",
+    "@types/html-webpack-plugin": "^3.2.4",
+    "@types/jest": "^26.0.15",
+    "@types/mini-css-extract-plugin": "^1.2.1",
+    "@types/node": "^14.14.9",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@types/react-redux": "^7.1.11",
+    "@types/webpack": "^4.41.25",
+    "@types/webpack-dev-server": "^3.11.1",
+    "autoprefixer": "^10.0.1",
+    "css-loader": "^5.0.0",
+    "html-webpack-plugin": "^4.5.0",
+    "jest": "^26.6.3",
+    "mini-css-extract-plugin": "^1.3.1",
+    "postcss": "^8.1.10",
+    "postcss-flexbugs-fixes": "^5.0.2",
+    "postcss-loader": "^4.1.0",
+    "postcss-preset-env": "^6.7.0",
     "prettier": "^2.2.0",
-    "lite-server": "^2.6.1"
+    "ts-jest": "^26.4.4",
+    "ts-loader": "^8.0.11",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.1.2",
+    "webpack": "^5.6.0",
+    "webpack-cli": "^4.2.0",
+    "webpack-dev-server": "^3.11.0"
   }
 }
