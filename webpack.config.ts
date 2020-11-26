@@ -52,20 +52,12 @@ const config: Configuration = {
       {
         test: /\.css$/i,
         use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              hmr: process.env.NODE_ENV === "development", // webpack 4 only
-            },
-          },
-          {
-            loader: "css-loader",
-          },
+          MiniCssExtractPlugin.loader,
+          "css-loader",
           {
             loader: "postcss-loader",
             options: {
               postcssOptions: {
-                ident: "postcss",
                 plugins: [require("tailwindcss"), require("autoprefixer")],
               },
             },
