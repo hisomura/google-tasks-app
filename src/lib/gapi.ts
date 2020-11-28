@@ -8,7 +8,11 @@ const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/tasks/v1/r
 // included, separated by spaces.
 const SCOPES = "https://www.googleapis.com/auth/tasks.readonly";
 
-async function initClient() {
+export async function initGapiClient() {
+  // https://stackoverflow.com/a/58822126/10109900
+  await new Promise((resolve) => {
+    gapi.load("client:auth2", resolve);
+  });
   await gapi.client.init({
     apiKey: API_KEY,
     clientId: CLIENT_ID,

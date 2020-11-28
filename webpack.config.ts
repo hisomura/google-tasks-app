@@ -27,6 +27,7 @@ const config: Configuration = {
   devServer: {
     open: true,
     historyApiFallback: true,
+    port: 8000
   },
 
   plugins: [

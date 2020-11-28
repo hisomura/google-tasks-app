@@ -1,25 +1,18 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-
-
-function initGapiClient() {
-  gapi.load('client:auth2', initClient);
-}
+import { initGapiClient } from "./lib/gapi";
 
 export default function App() {
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
+    const init = () => initGapiClient().then(() => setIsInitialized(true));
     if (gapi !== undefined) {
-      initGapiClient();
-      setIsInitialized(true);
+      init();
     } else {
       // not tested.
       const gapiScriptElement = document.getElementById("gapi")!;
-      gapiScriptElement.onload = () => {
-        initGapiClient();
-        setIsInitialized(true);
-      }
+      gapiScriptElement.onload = init;
     }
   }, []);
 
