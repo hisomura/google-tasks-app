@@ -14,7 +14,7 @@ const GapiAuthProvider: FC = (props) => {
         setGapiReady(true);
         setSignedIn(gapi.auth2.getAuthInstance().isSignedIn.get());
       });
-    if (gapi !== undefined) {
+    if (typeof gapi !== "undefined") {
       init();
     } else {
       // not tested.
