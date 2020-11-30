@@ -15,7 +15,7 @@ const Board: FC = () => {
 
   return (
     <div>
-      <button type="button" onClick={signOutClickHandler}>
+      <button type="button" onClick={signOutClickHandler} className="m-8 border">
         Sign out.
       </button>
       <div className="flex flex-wrap">
