@@ -1,5 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
+import { GapiAuthProvider } from "./lib/GapiAuthProvider";
 
-ReactDOM.render(<App/>, document.getElementById("root"));
+ReactDOM.render(
+  <GapiAuthProvider>
+    <App />
+  </GapiAuthProvider>,
+  document.getElementById("root")
+);

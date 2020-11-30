@@ -1,6 +1,6 @@
 import React, { MouseEventHandler, useEffect, useState } from "react";
 import "./App.css";
-import { initGapiClient } from "./lib/gapi";
+import { useGapiAuth } from "./lib/GapiAuthProvider";
 import TaskList = gapi.client.tasks.TaskList;
 
 const signInClickHandler: MouseEventHandler<HTMLButtonElement> = (_event) => {
@@ -12,28 +12,11 @@ const signOutClickHandler: MouseEventHandler<HTMLButtonElement> = (_event) => {
 };
 
 export default function App() {
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [isSignedIn, setSignedIn] = useState(false);
+  const { gapiReady, signedIn } = useGapiAuth();
   const [taskLists, setLists] = useState<TaskList[]>([]);
 
   useEffect(() => {
-    const init = () =>
-      initGapiClient().then(() => {
-        gapi.auth2.getAuthInstance().isSignedIn.listen(setSignedIn);
-        setIsInitialized(true);
-        setSignedIn(gapi.auth2.getAuthInstance().isSignedIn.get());
-      });
-    if (gapi !== undefined) {
-      init();
-    } else {
-      // not tested.
-      const gapiScriptElement = document.getElementById("gapi")!;
-      gapiScriptElement.onload = init;
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!isSignedIn) return;
+    if (!signedIn) return;
 
     gapi.client.tasks.tasklists
       .list({
@@ -43,13 +26,11 @@ export default function App() {
         if (!response.result.items) return;
         setLists(response.result.items);
       });
-  }, [isSignedIn]);
+  }, [signedIn]);
 
-  if (!isInitialized) {
-    return <div>waiting...</div>;
-  }
+  if (!gapiReady) return <div>waiting...</div>;
 
-  if (!isSignedIn) {
+  if (!signedIn) {
     return (
       <div>
         <button type="button" onClick={signInClickHandler}>
