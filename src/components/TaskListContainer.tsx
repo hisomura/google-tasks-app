@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { useQuery } from "react-query";
-import { MdPanoramaFishEye } from "react-icons/all";
+import CompleteButton from "./CompleteButton";
 import TaskList = gapi.client.tasks.TaskList;
 import Task = gapi.client.tasks.Task;
 
@@ -10,7 +10,7 @@ function renderTasks(tasks: Task[]) {
       <hr />
       <div className="flex items-center p-3">
         <div className="flex-initial mr-3">
-          <MdPanoramaFishEye />
+          <CompleteButton completeTask={() => {}} />
         </div>
         <div className="flex-initial break-all">{task.title}</div>
       </div>
