@@ -21,7 +21,7 @@ const Board: FC = () => {
       <div className="flex flex-wrap">
         {data?.map((taskList) => (
           <div key={taskList.id} className="">
-            <TaskListContainer list={taskList}/>
+            <TaskListContainer tasklist={taskList}/>
           </div>
         ))}
       </div>

@@ -1,5 +1,5 @@
 import { MdDone, MdPanoramaFishEye } from "react-icons/all";
-import { FC } from "react";
+import { FC, MouseEventHandler } from "react";
 import styled from "styled-components";
 
 const Div = styled.div`
@@ -32,9 +32,9 @@ const Div = styled.div`
   }
 `;
 
-const CompleteButton: FC<{ completeTask: () => void }> = (props) => {
+const CompleteButton: FC<{ onClick: MouseEventHandler<HTMLDivElement> }> = (props) => {
   return (
-    <Div>
+    <Div onClick={props.onClick}>
       <MdPanoramaFishEye />
       <MdDone />
     </Div>

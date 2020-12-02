@@ -1,3 +1,5 @@
+import Task = gapi.client.tasks.Task;
+
 const CLIENT_ID = "471921200035-m1q24a39lsd0uihb4t6i89di3an22u0k.apps.googleusercontent.com";
 const API_KEY = "AIzaSyDh6FqTnqKgzckbXVYsj1j3yEDQL6S_J6I";
 
@@ -6,7 +8,7 @@ const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/tasks/v1/r
 
 // Authorization scopes required by the API; multiple scopes can be
 // included, separated by spaces.
-const SCOPES = "https://www.googleapis.com/auth/tasks.readonly";
+const SCOPES = "https://www.googleapis.com/auth/tasks";
 
 export async function initGapiClient() {
   // https://stackoverflow.com/a/58822126/10109900
@@ -20,4 +22,15 @@ export async function initGapiClient() {
     scope: SCOPES,
   });
   console.log("client initialized.");
+}
+
+export async function updateTaskCompleted({ tasklistId, task }: { tasklistId: string; task: Task }) {
+  await gapi.client.tasks.tasks.update({
+    tasklist: tasklistId,
+    task: task.id!,
+    resource: { ...task, status: "completed" },
+  });
+  return gapi.client.tasks.tasks.clear({
+    tasklist: tasklistId
+  })
 }
