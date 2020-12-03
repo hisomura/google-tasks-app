@@ -28,6 +28,7 @@
     "tailwindcss": "^2.0.1"
   },
   "devDependencies": {
+    "@maxim_mazurok/gapi.client.tasks": "^1.0.20201124",
     "@testing-library/dom": "^7.28.1",
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^11.2.2",

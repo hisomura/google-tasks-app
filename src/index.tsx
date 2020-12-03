@@ -3,6 +3,7 @@ import App from "./App";
 import { QueryCache, ReactQueryCacheProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query-devtools";
 import { GapiAuthProvider } from "./lib/GapiAuthProvider";
+/// <reference types="../node_modules/@maxim_mazurok/gapi.client.tasks" />
 
 const queryCache = new QueryCache();
 ReactDOM.render(
