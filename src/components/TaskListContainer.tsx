@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { useMutation, useQuery, useQueryCache } from "react-query";
 import CompleteButton from "./CompleteButton";
-import { updateTaskCompleted } from "../lib/gapi";
+import { getTasks, updateTaskCompleted } from "../lib/gapi";
 import TaskList = gapi.client.tasks.TaskList;
 import Task = gapi.client.tasks.Task;
 
@@ -35,13 +35,8 @@ function separateAndSortTasks(input: Task[]) {
 const TaskListContainer: FC<{ tasklist: TaskList }> = (props) => {
   const { isLoading, data } = useQuery(["tasklists", props.tasklist.id], async () => {
     if (props.tasklist.id === undefined) return undefined;
-    const tasklists = await gapi.client.tasks.tasks
-      .list({
-        maxResults: 100,
-        tasklist: props.tasklist.id,
-      })
-      .then((res) => res.result.items);
-    return tasklists ?? [];
+    const tasks = await getTasks(props.tasklist.id);
+    return tasks ?? [];
   });
 
   const cache = useQueryCache();
@@ -58,7 +53,7 @@ const TaskListContainer: FC<{ tasklist: TaskList }> = (props) => {
     return <div>Something wrong</div>;
   }
 
-  const [tasks, ] = separateAndSortTasks(data);
+  const [tasks] = separateAndSortTasks(data);
 
   return (
     <div className="p-2 w-64">

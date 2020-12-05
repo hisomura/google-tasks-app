@@ -1,5 +1,6 @@
 import ReactDOM from "react-dom";
 import App from "./App";
+import "./index.css";
 import { QueryCache, ReactQueryCacheProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query-devtools";
 import { GapiAuthProvider } from "./lib/GapiAuthProvider";

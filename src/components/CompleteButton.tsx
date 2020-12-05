@@ -1,4 +1,4 @@
-import { MdDone, MdPanoramaFishEye } from "react-icons/all";
+import { MdDone, MdPanoramaFishEye } from "react-icons/md";
 import { FC, MouseEventHandler } from "react";
 import styled from "styled-components";
 

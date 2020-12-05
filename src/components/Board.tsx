@@ -1,27 +1,22 @@
-import { FC, MouseEventHandler } from "react";
+import { FC } from "react";
 import { useQuery } from "react-query";
 import TaskListContainer from "./TaskListContainer";
-
-const signOutClickHandler: MouseEventHandler<HTMLButtonElement> = (_event) => {
-  gapi.auth2.getAuthInstance().signOut();
-};
+import { getTasklists, signOut } from "../lib/gapi";
 
 const Board: FC = () => {
-  const { isLoading, data } = useQuery("tasklists", () =>
-    gapi.client.tasks.tasklists.list({ maxResults: 100 }).then((res) => res.result.items)
-  );
+  const { isLoading, data } = useQuery("tasklists", getTasklists);
 
   if (isLoading) return <>"Loading..."</>;
 
   return (
     <div>
-      <button type="button" onClick={signOutClickHandler} className="m-8 border">
+      <button type="button" onClick={signOut} className="m-8 border">
         Sign out.
       </button>
       <div className="flex flex-wrap">
         {data?.map((taskList) => (
           <div key={taskList.id} className="">
-            <TaskListContainer tasklist={taskList}/>
+            <TaskListContainer tasklist={taskList} />
           </div>
         ))}
       </div>

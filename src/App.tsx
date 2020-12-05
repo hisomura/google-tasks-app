@@ -1,5 +1,4 @@
 import { MouseEventHandler } from "react";
-import "./App.css";
 import { useGapiAuth } from "./lib/GapiAuthProvider";
 import Board from "./components/Board";
 
