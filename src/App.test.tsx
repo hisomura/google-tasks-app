@@ -25,7 +25,7 @@ describe("App", () => {
     expect(screen.getByText(/waiting.../)).toBeInTheDocument();
   });
 
-  it("shows 'Sign In' button after gapi is loaded", async () => {
+  it("shows 'Sign in' button after gapi is loaded", async () => {
     // @ts-ignore Too hard to prepare gapi object
     global.gapi = {};
     render(
@@ -34,5 +34,17 @@ describe("App", () => {
       </GapiAuthProvider>
     );
     expect(await screen.findByRole("button")).toHaveTextContent("Sign in");
+  });
+
+  it("shows 'Sign out' button when use is signed in", async () => {
+    // @ts-ignore Too hard to prepare gapi object
+    global.gapi = {};
+    mockGapi.isSignedIn.mockImplementation(() => true);
+    render(
+      <GapiAuthProvider>
+        <App />
+      </GapiAuthProvider>
+    );
+    expect(await screen.findByRole("button")).toHaveTextContent("Sign out");
   });
 });
