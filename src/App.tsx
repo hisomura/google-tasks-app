@@ -14,9 +14,7 @@ export default function App() {
   if (!signedIn) {
     return (
       <div>
-        <button type="button" onClick={signInClickHandler}>
-          Sign in.
-        </button>
+        <button type="button" onClick={signInClickHandler}>Sign in.</button>
       </div>
     );
   }

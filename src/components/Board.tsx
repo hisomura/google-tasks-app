@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { useQuery } from "react-query";
 import TaskListContainer from "./TaskListContainer";
-import { getTasklists, signOut } from "../lib/gapi";
+import { getTasklists, signOut } from "../lib/gapi-wrappers";
 
 const Board: FC = () => {
   const { isLoading, data } = useQuery("tasklists", getTasklists);

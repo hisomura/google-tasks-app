@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { useMutation, useQuery, useQueryCache } from "react-query";
 import CompleteButton from "./CompleteButton";
-import { getTasks, updateTaskCompleted } from "../lib/gapi";
+import { getTasks, updateTaskCompleted } from "../lib/gapi-wrappers";
 import TaskList = gapi.client.tasks.TaskList;
 import Task = gapi.client.tasks.Task;
 

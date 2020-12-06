@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react";
-import { initGapiClient, isSignedIn, listenIsSignedIn } from "./gapi";
+import { initGapiClient, isSignedIn, listenIsSignedIn } from "./gapi-wrappers";
 
 const GapiAuthContext = React.createContext({ gapiReady: false, signedIn: false });
 
@@ -8,12 +8,12 @@ const GapiAuthProvider: FC = (props) => {
   const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => {
-    const init = () =>
-      initGapiClient().then(() => {
-        listenIsSignedIn(setSignedIn);
-        setGapiReady(true);
-        setSignedIn(isSignedIn());
-      });
+    async function init () {
+      await initGapiClient()
+      listenIsSignedIn(setSignedIn);
+      setGapiReady(true);
+      setSignedIn(isSignedIn());
+    }
     if (typeof gapi !== "undefined") {
       init();
     } else {
