@@ -46,7 +46,14 @@ const TaskListContainer: FC<{ tasklist: TaskList }> = (props) => {
     },
   });
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) {
+    return (
+      <div className="p-2 w-64">
+        <p className="break-words pl-3 font-bold text-lg">{props.tasklist.title}</p>
+        <div>Loading...</div>
+      </div>
+    );
+  }
 
   if (data === undefined) {
     console.error(`data is undefined. tasklistId: ${props.tasklist.id}`);
