@@ -5,21 +5,15 @@ import App from "./App";
 import * as gapi from "./lib/gapi";
 
 jest.mock("./lib/gapi");
+const mockGapi = gapi as jest.Mocked<typeof gapi>;
 
 describe("App", () => {
+  // @ts-ignore Too hard to prepare GoogleUser object.
+  mockGapi.signIn.mockImplementation(async () => {});
+  mockGapi.listenIsSignedIn.mockImplementation(() => {});
+  mockGapi.isSignedIn.mockImplementation(() => false);
+
   it("shows 'waiting...' before load gapi", () => {
-    // @ts-ignore
-    // gapi.__setSignInReturnValue("hoge");
-    // signIn.
-    // foobar.mockImplementation(() => 'hoge');
-    // const mockFn = jest.fn().mockImplementation(scalar => 42 + scalar);
-
-    gapi.signIn.mockImplementation(() => "hoge");
-    // @ts-ignore
-    gapi.listenIsSignedIn.mockImplementation(() => {});
-    // @ts-ignore
-    gapi.isSignedIn.mockImplementation(() => false);
-
     render(<App />);
     expect(screen.getByText(/waiting.../)).toBeInTheDocument();
   });
