@@ -10,7 +10,8 @@
     "build": "webpack",
     "test": "jest --maxWorkers=1",
     "clearCache": "jest --clearCache",
-    "design": "lite-server --baseDir=tmp"
+    "design": "lite-server --baseDir=tmp",
+    "format": "prettier -w src/"
   },
   "prettier": {
     "printWidth": 120
