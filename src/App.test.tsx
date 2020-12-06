@@ -1,7 +1,4 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
-import "@testing-library/jest-dom/extend-expect";
+import { render, screen } from "./test-utils";
 import App from "./App";
 import * as gapi from "./lib/gapi-wrappers";
 import { GapiAuthProvider } from "./lib/GapiAuthProvider";
@@ -16,18 +13,29 @@ describe("App", () => {
     mockGapi.initGapiClient.mockImplementation(() => Promise.resolve());
     mockGapi.listenIsSignedIn.mockImplementation(() => {});
     mockGapi.isSignedIn.mockImplementation(() => false);
+
+    // @ts-ignore Too hard to prepare gapi object
+    global.gapi = {};
   }
 
   beforeEach(initMockToDefault);
 
   it("shows 'waiting...' before gapi is loaded", () => {
-    render(<App />);
+    // @ts-ignore
+    global.gapi = undefined;
+    const script = document.createElement("script");
+    script.id = "gapi-el";
+    document.body.appendChild(script);
+
+    render(
+      <GapiAuthProvider>
+        <App />
+      </GapiAuthProvider>
+    );
     expect(screen.getByText(/waiting.../)).toBeInTheDocument();
   });
 
   it("shows 'Sign in' button after gapi is loaded", async () => {
-    // @ts-ignore Too hard to prepare gapi object
-    global.gapi = {};
     render(
       <GapiAuthProvider>
         <App />
@@ -37,8 +45,6 @@ describe("App", () => {
   });
 
   it("shows 'Sign out' button when use is signed in", async () => {
-    // @ts-ignore Too hard to prepare gapi object
-    global.gapi = {};
     mockGapi.isSignedIn.mockImplementation(() => true);
     render(
       <GapiAuthProvider>

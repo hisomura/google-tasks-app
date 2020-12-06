@@ -17,7 +17,6 @@ const GapiAuthProvider: FC = (props) => {
     if (typeof gapi !== "undefined") {
       init();
     } else {
-      // not tested.
       const gapiScriptElement = document.getElementById("gapi-el")!;
       gapiScriptElement.onload = init;
     }
