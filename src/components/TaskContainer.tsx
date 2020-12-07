@@ -28,10 +28,12 @@ const TaskContainer: FC<Props> = (props) => {
         <div className="flex-initial mr-3">
           <CompleteButton onClick={() => completeTask({ tasklistId: props.tasklistId, task: props.task })} />
         </div>
-        <div className="flex-initial break-all">{props.task.title}</div>
+        <div className="flex-initial break-all" style={{ textDecorationLine: completed ? "line-through" : "none" }}>
+          {props.task.title}
+        </div>
       </div>
     </div>
   );
 };
 
-export default TaskContainer
+export default TaskContainer;
