@@ -1,4 +1,5 @@
 import Task = gapi.client.tasks.Task;
+import TaskList = gapi.client.tasks.TaskList
 
 const CLIENT_ID = "471921200035-m1q24a39lsd0uihb4t6i89di3an22u0k.apps.googleusercontent.com";
 const API_KEY = "AIzaSyDh6FqTnqKgzckbXVYsj1j3yEDQL6S_J6I";
@@ -60,3 +61,5 @@ export async function getTasklists() {
   const res = await gapi.client.tasks.tasklists.list({ maxResults: 100 });
   return res.result.items;
 }
+
+export { Task, TaskList }
