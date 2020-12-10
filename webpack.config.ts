@@ -7,27 +7,27 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const path = require("path");
 
-const devMode = process.env.NODE_ENV !== "production";
+const prodMode = process.env.NODE_ENV === "production";
 
 const config: Configuration = {
-  mode: "development",
+  mode: prodMode ? "production" : "development",
   entry: "./src/index.tsx",
   output: {
     path: path.resolve(__dirname, "dist"),
     publicPath: "/",
-    filename: "index.js",
+    filename: prodMode ? "[name].[hash].js" : "[name].js",
   },
 
   resolve: {
     extensions: [".js", ".json", ".ts", ".tsx"],
   },
 
-  devtool: "source-map",
+  devtool: prodMode ? undefined : "source-map",
 
   devServer: {
     open: true,
     historyApiFallback: true,
-    port: 8000
+    port: 8000,
   },
 
   plugins: [
@@ -37,8 +37,7 @@ const config: Configuration = {
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
-      filename: devMode ? "[name].css" : "[name].[hash].css",
-      chunkFilename: devMode ? "[id].css" : "[id].[hash].css",
+      filename: prodMode ? "[name].[hash].css" : "[name].css",
     }),
   ],
 
@@ -46,7 +45,12 @@ const config: Configuration = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: "ts-loader",
+        use: {
+          loader: "ts-loader",
+          options: {
+            configFile: prodMode ? "tsconfig.prod.json" : "tsconfig.json",
+          },
+        },
         include: path.resolve(__dirname, "src"),
         exclude: /node_modules/,
       },
