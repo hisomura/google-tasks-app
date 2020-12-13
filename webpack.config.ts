@@ -15,7 +15,7 @@ const config: Configuration = {
   output: {
     path: path.resolve(__dirname, "dist"),
     publicPath: "/",
-    filename: prodMode ? "[name].[hash].js" : "[name].js",
+    filename: prodMode ? "[name].[fullhash].js" : "[name].js",
   },
 
   resolve: {
@@ -37,7 +37,7 @@ const config: Configuration = {
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
-      filename: prodMode ? "[name].[hash].css" : "[name].css",
+      filename: prodMode ? "[name].[fullhash].css" : "[name].css",
     }),
   ],
 
