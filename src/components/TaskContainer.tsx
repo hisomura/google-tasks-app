@@ -1,6 +1,8 @@
 import { FC, useState } from "react";
 import { Task, updateTaskCompleted } from "../lib/gapi-wrappers";
 import { useMutation, useQueryCache } from "react-query";
+import { useDispatch } from "react-redux";
+import tasksDragSlice from "../store/tasksDragSlice";
 import CompleteButton from "./CompleteButton";
 
 type Props = {
@@ -10,6 +12,7 @@ type Props = {
 
 const TaskContainer: FC<Props> = (props) => {
   const cache = useQueryCache();
+  const dispatch = useDispatch();
   const [completed, setCompleted] = useState(false);
   const [completeTask] = useMutation(
     (props: { tasklistId: string; task: Task }) => {
@@ -22,7 +25,15 @@ const TaskContainer: FC<Props> = (props) => {
   );
 
   return (
-    <div>
+    <div
+      draggable={true}
+      onDragStart={(e) => {
+        const offset = { x: e.clientX, y: e.clientY };
+        dispatch(
+          tasksDragSlice.actions.dragStart({ offset: offset, fromTaskListId: props.tasklistId, task: props.task })
+        );
+      }}
+    >
       <hr />
       <div className="flex items-center p-3">
         <div className="flex-initial mr-3">
