@@ -1,32 +1,62 @@
 import { createSlice, SliceCaseReducers } from "@reduxjs/toolkit";
-import { Task } from "../lib/gapi-wrappers";
+import { moveTasksToAnotherTasklist, Task } from "../lib/gapi-wrappers";
+import { original } from "immer";
 
 type Offset = { x: number; y: number };
 
 export type DragState = {
+  dragState: "yet-started" | "dragging" | "drop-animation" | "cancel-animation";
   initialClientOffset: Offset | null;
   currentClientOffset: Offset | null;
-  dragState: "yetstarted" | "dragging" | "dropeffect" | "finished";
-  fromTaskListId: string | null;
+  fromTasklistId: string | null;
   tasks: Task[];
 };
 
 export const tasksDragSlice = createSlice<DragState, SliceCaseReducers<DragState>>({
   name: "taskDrag",
   initialState: {
+    dragState: "yet-started",
     initialClientOffset: null,
     currentClientOffset: null,
-    dragState: "yetstarted",
-    fromTaskListId: null,
+    fromTasklistId: null,
     tasks: [],
   },
   reducers: {
-    dragStart: (state, action: { payload: { offset: Offset; fromTaskListId: string; task: Task } }) => {
+    dragStart: (state, action: { payload: { offset: Offset; fromTasklistId: string; task: Task } }) => {
+      state.dragState = "dragging";
       state.initialClientOffset = action.payload.offset;
       state.currentClientOffset = action.payload.offset;
-      state.fromTaskListId = action.payload.fromTaskListId;
-      state.dragState = "dragging";
+      state.fromTasklistId = action.payload.fromTasklistId;
       state.tasks.push(action.payload.task);
+    },
+    drop: (state, action: { payload: { offset: Offset; toTasklistId: string } }) => {
+      state.dragState = "drop-animation";
+      state.currentClientOffset = action.payload.offset;
+      console.log("drop payload:  ", action.payload);
+      console.log(action.payload.toTasklistId);
+      console.log(action.payload.offset);
+
+      const tasks = original<Task[]>(state.tasks);
+      if (!tasks || tasks.length === 0) throw Error("'tasks' is empty.");
+
+      moveTasksToAnotherTasklist(tasks, state.fromTasklistId!, action.payload.toTasklistId);
+
+      // animation
+    },
+    dragEnd: (state, action: { payload: { offset: Offset } }) => {
+      state.dragState = "cancel-animation";
+      state.initialClientOffset = action.payload.offset;
+      state.currentClientOffset = action.payload.offset;
+      state.tasks = [];
+
+      // animation
+    },
+    initTaskDragState: (state, _action: {}) => {
+      state.dragState = "yet-started";
+      state.initialClientOffset = null;
+      state.currentClientOffset = null;
+      state.fromTasklistId = null;
+      state.tasks = [];
     },
   },
 });

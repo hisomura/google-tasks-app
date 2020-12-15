@@ -2,6 +2,8 @@ import { FC } from "react";
 import { useQuery } from "react-query";
 import { getTasks, Task, TaskList } from "../lib/gapi-wrappers";
 import TaskContainer from "./TaskContainer";
+import { useDispatch } from "react-redux";
+import tasksDragSlice from "../store/tasksDragSlice";
 
 const taskSortFunc = (a: Task, b: Task) => parseInt(a.position!) - parseInt(b.position!);
 
@@ -31,6 +33,7 @@ function separateAndSortTasks(input: Task[]) {
 }
 
 const TaskListContainer: FC<{ tasklist: TaskList }> = (props) => {
+  const dispatch = useDispatch();
   const { isLoading, data } = useQuery(["tasklists", props.tasklist.id], async () => {
     if (props.tasklist.id === undefined) return undefined;
     const tasks = await getTasks(props.tasklist.id);
@@ -54,7 +57,17 @@ const TaskListContainer: FC<{ tasklist: TaskList }> = (props) => {
   const [tasks] = separateAndSortTasks(data);
 
   return (
-    <div className="p-2 w-64">
+    <div
+      className="p-2 w-64"
+      onDragOver={(e) => {
+        e.preventDefault();
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        const offset = { x: e.clientX, y: e.clientY };
+        dispatch(tasksDragSlice.actions.drop({ offset: offset, toTasklistId: props.tasklist.id }));
+      }}
+    >
       <p className="break-words pl-3 font-bold text-lg">{props.tasklist.title}</p>
       {tasks.map((task) => (
         <TaskContainer key={task.id} tasklistId={props.tasklist.id!} task={task} />

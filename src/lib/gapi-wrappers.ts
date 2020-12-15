@@ -1,5 +1,5 @@
 import Task = gapi.client.tasks.Task;
-import TaskList = gapi.client.tasks.TaskList
+import TaskList = gapi.client.tasks.TaskList;
 
 const CLIENT_ID = "471921200035-m1q24a39lsd0uihb4t6i89di3an22u0k.apps.googleusercontent.com";
 const API_KEY = "AIzaSyDh6FqTnqKgzckbXVYsj1j3yEDQL6S_J6I";
@@ -41,6 +41,15 @@ export function signOut() {
   return gapi.auth2.getAuthInstance().signOut();
 }
 
+export async function moveTasksToAnotherTasklist(tasks: Task[], fromTasklistId: string, toTasklistId: string) {
+  console.log(tasks, fromTasklistId, toTasklistId);
+  const task = tasks[0];
+  await Promise.all([
+    gapi.client.tasks.tasks.delete({ tasklist: fromTasklistId, task: task.id! }),
+    gapi.client.tasks.tasks.insert({ tasklist: toTasklistId, resource: task }),
+  ]);
+}
+
 export async function updateTaskCompleted({ tasklistId, task }: { tasklistId: string; task: Task }) {
   await gapi.client.tasks.tasks.update({
     tasklist: tasklistId,
@@ -62,4 +71,4 @@ export async function getTasklists() {
   return res.result.items;
 }
 
-export { Task, TaskList }
+export { Task, TaskList };
