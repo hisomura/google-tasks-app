@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 import { Task, updateTaskCompleted } from "../lib/gapi-wrappers";
-import { useMutation, useQueryCache } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { useDispatch } from "react-redux";
 import tasksDragSlice from "../store/tasksDragSlice";
 import CompleteButton from "./CompleteButton";
@@ -11,16 +11,16 @@ type Props = {
 };
 
 const TaskContainer: FC<Props> = (props) => {
-  const cache = useQueryCache();
+  const client = useQueryClient();
   const dispatch = useDispatch();
   const [completed, setCompleted] = useState(false);
-  const [completeTask] = useMutation(
+  const mutation = useMutation(
     (props: { tasklistId: string; task: Task }) => {
       setCompleted(true);
       return updateTaskCompleted({ tasklistId: props.tasklistId, task: props.task });
     },
     {
-      onSuccess: () => cache.invalidateQueries(["tasklists", props.tasklistId]),
+      onSuccess: () => client.invalidateQueries(["tasklists", props.tasklistId]),
     }
   );
 
@@ -37,7 +37,7 @@ const TaskContainer: FC<Props> = (props) => {
       <hr />
       <div className="flex items-center p-3">
         <div className="flex-initial mr-3">
-          <CompleteButton onClick={() => completeTask({ tasklistId: props.tasklistId, task: props.task })} />
+          <CompleteButton onClick={() => mutation.mutate({ tasklistId: props.tasklistId, task: props.task })} />
         </div>
         <div className="flex-initial break-all" style={{ textDecorationLine: completed ? "line-through" : "none" }}>
           {props.task.title}

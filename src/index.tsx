@@ -4,20 +4,19 @@ import "./index.css";
 import { Provider } from "react-redux";
 import store from "./store/store";
 
-import { QueryCache, ReactQueryCacheProvider } from "react-query";
-import { ReactQueryDevtools } from "react-query-devtools";
+import { QueryClient, QueryClientProvider } from "react-query";
+// import { ReactQueryDevtools } from "react-query-devtools";
 import { GapiAuthProvider } from "./lib/GapiAuthProvider";
 
-const queryCache = new QueryCache();
+const queryClient = new QueryClient();
 ReactDOM.render(
   <>
     <Provider store={store}>
-      <ReactQueryCacheProvider queryCache={queryCache}>
+      <QueryClientProvider client={queryClient}>
         <GapiAuthProvider>
           <App />
         </GapiAuthProvider>
-      </ReactQueryCacheProvider>
-      <ReactQueryDevtools initialIsOpen />
+      </QueryClientProvider>
     </Provider>
   </>,
   document.getElementById("root")
