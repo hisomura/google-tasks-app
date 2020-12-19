@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import { Task, updateTaskCompleted } from "../lib/gapi-wrappers";
 import { useMutation, useQueryClient } from "react-query";
 import { useDispatch } from "react-redux";
-import tasksDragSlice from "../store/tasksDragSlice";
+import { dragStart, updateOffset } from "../store/tasksDragSlice";
 import CompleteButton from "./CompleteButton";
 
 type Props = {
@@ -29,9 +29,11 @@ const TaskContainer: FC<Props> = (props) => {
       draggable={true}
       onDragStart={(e) => {
         const offset = { x: e.clientX, y: e.clientY };
-        dispatch(
-          tasksDragSlice.actions.dragStart({ offset: offset, fromTasklistId: props.tasklistId, task: props.task })
-        );
+        dispatch(dragStart({ offset, fromTasklistId: props.tasklistId, task: props.task }));
+      }}
+      onDrag={(e) => {
+        const offset = { x: e.clientX, y: e.clientY };
+        dispatch(updateOffset({ offset }));
       }}
     >
       <hr />

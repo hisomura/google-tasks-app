@@ -8,7 +8,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 // import { ReactQueryDevtools } from "react-query-devtools";
 import { GapiAuthProvider } from "./lib/GapiAuthProvider";
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 ReactDOM.render(
   <>
     <Provider store={store}>

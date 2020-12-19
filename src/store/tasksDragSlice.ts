@@ -1,6 +1,7 @@
 import { createSlice, SliceCaseReducers } from "@reduxjs/toolkit";
 import { moveTasksToAnotherTasklist, Task } from "../lib/gapi-wrappers";
 import { original } from "immer";
+import { queryClient } from "../index";
 
 type Offset = { x: number; y: number };
 
@@ -29,6 +30,10 @@ export const tasksDragSlice = createSlice<DragState, SliceCaseReducers<DragState
       state.fromTasklistId = action.payload.fromTasklistId;
       state.tasks.push(action.payload.task);
     },
+    updateOffset: (state, action: { payload: { offset: Offset } }) => {
+      state.currentClientOffset = action.payload.offset;
+    },
+
     drop: (state, action: { payload: { offset: Offset; toTasklistId: string } }) => {
       state.dragState = "drop-animation";
       state.currentClientOffset = action.payload.offset;
@@ -39,7 +44,12 @@ export const tasksDragSlice = createSlice<DragState, SliceCaseReducers<DragState
       const tasks = original<Task[]>(state.tasks);
       if (!tasks || tasks.length === 0) throw Error("'tasks' is empty.");
 
-      moveTasksToAnotherTasklist(tasks, state.fromTasklistId!, action.payload.toTasklistId);
+      const fromTasklistId = state.fromTasklistId!;
+      const toTasklistId = action.payload.toTasklistId;
+      moveTasksToAnotherTasklist(tasks, fromTasklistId, toTasklistId).then(() => {
+        queryClient.invalidateQueries(["tasklists", fromTasklistId]);
+        queryClient.invalidateQueries(["tasklists", toTasklistId]);
+      });
 
       // animation
     },
@@ -61,6 +71,6 @@ export const tasksDragSlice = createSlice<DragState, SliceCaseReducers<DragState
   },
 });
 
-export const { dragStart } = tasksDragSlice.actions;
+export const { dragStart, updateOffset } = tasksDragSlice.actions;
 
 export default tasksDragSlice;
