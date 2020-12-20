@@ -71,6 +71,6 @@ export const tasksDragSlice = createSlice<DragState, SliceCaseReducers<DragState
   },
 });
 
-export const { dragStart, updateOffset } = tasksDragSlice.actions;
+export const { dragStart, updateOffset, drop, dragEnd } = tasksDragSlice.actions;
 
 export default tasksDragSlice;
