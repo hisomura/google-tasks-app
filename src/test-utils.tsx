@@ -5,7 +5,8 @@ import { FC, ReactElement } from "react";
 import { Provider } from "react-redux";
 import { rootReducer } from "./store/store";
 import { createStore, Store } from "redux";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClientProvider } from "react-query";
+import { queryClient } from "./globals";
 
 interface Options extends RenderOptions {
   initialState?: {};
@@ -15,7 +16,6 @@ interface Options extends RenderOptions {
 const customRender = (ui: ReactElement, options: Options = {}) => {
   const { initialState, store, ...renderOptions } = options;
   const testStore = store ?? createStore(rootReducer, initialState);
-  const queryClient = new QueryClient();
   const Wrapper: FC = (props) => {
     return (
       <QueryClientProvider client={queryClient}>

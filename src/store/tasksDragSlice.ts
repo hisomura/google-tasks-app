@@ -1,7 +1,7 @@
 import { createSlice, SliceCaseReducers } from "@reduxjs/toolkit";
 import { moveTasksToAnotherTasklist, Task } from "../lib/gapi-wrappers";
 import { original } from "immer";
-import { queryClient } from "../index";
+import { queryClient } from "../globals";
 
 type Offset = { x: number; y: number };
 
