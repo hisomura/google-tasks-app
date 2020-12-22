@@ -1,5 +1,11 @@
-import Task = gapi.client.tasks.Task;
-import TaskList = gapi.client.tasks.TaskList;
+import GapiTask = gapi.client.tasks.Task;
+import GapiTaskList = gapi.client.tasks.TaskList;
+
+interface Task extends GapiTask {
+  taskListId: string;
+}
+
+interface TaskList extends GapiTaskList {}
 
 const CLIENT_ID = "471921200035-m1q24a39lsd0uihb4t6i89di3an22u0k.apps.googleusercontent.com";
 const API_KEY = "AIzaSyDh6FqTnqKgzckbXVYsj1j3yEDQL6S_J6I";
@@ -61,9 +67,10 @@ export async function updateTaskCompleted({ tasklistId, task }: { tasklistId: st
   });
 }
 
-export async function getTasks(taskListId: string) {
+export async function getTasks(taskListId: string): Promise<Task[]> {
   const res = await gapi.client.tasks.tasks.list({ maxResults: 100, tasklist: taskListId });
-  return res.result.items ?? [];
+  if (!res.result.items) return [];
+  return res.result.items.map((item) => ({ ...item, taskListId }));
 }
 
 export async function getTasklists() {
