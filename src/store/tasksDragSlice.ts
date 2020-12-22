@@ -9,7 +9,6 @@ export type DragState = {
   dragState: "yet-started" | "dragging" | "drop-animation" | "cancel-animation";
   initialClientOffset: Offset | null;
   currentClientOffset: Offset | null;
-  fromTasklistId: string | null;
   tasks: Task[];
 };
 
@@ -19,15 +18,13 @@ export const tasksDragSlice = createSlice<DragState, SliceCaseReducers<DragState
     dragState: "yet-started",
     initialClientOffset: null,
     currentClientOffset: null,
-    fromTasklistId: null,
     tasks: [],
   },
   reducers: {
-    dragStart: (state, action: { payload: { offset: Offset; fromTasklistId: string; task: Task } }) => {
+    dragStart: (state, action: { payload: { offset: Offset; task: Task } }) => {
       state.dragState = "dragging";
       state.initialClientOffset = action.payload.offset;
       state.currentClientOffset = action.payload.offset;
-      state.fromTasklistId = action.payload.fromTasklistId;
       state.tasks.push(action.payload.task);
     },
     updateOffset: (state, action: { payload: { offset: Offset } }) => {
@@ -44,10 +41,9 @@ export const tasksDragSlice = createSlice<DragState, SliceCaseReducers<DragState
       const tasks = original<Task[]>(state.tasks);
       if (!tasks || tasks.length === 0) throw Error("'tasks' is empty.");
 
-      const fromTasklistId = state.fromTasklistId!;
       const toTasklistId = action.payload.toTasklistId;
-      moveTasksToAnotherTasklist(tasks, fromTasklistId, toTasklistId).then(() => {
-        queryClient.invalidateQueries(["tasklists", fromTasklistId]);
+      moveTasksToAnotherTasklist(tasks, toTasklistId).then(() => {
+        queryClient.invalidateQueries(["tasklists", tasks[0].taskListId]);
         queryClient.invalidateQueries(["tasklists", toTasklistId]);
       });
 
@@ -65,7 +61,6 @@ export const tasksDragSlice = createSlice<DragState, SliceCaseReducers<DragState
       state.dragState = "yet-started";
       state.initialClientOffset = null;
       state.currentClientOffset = null;
-      state.fromTasklistId = null;
       state.tasks = [];
     },
   },

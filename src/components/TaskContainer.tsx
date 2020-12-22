@@ -29,7 +29,7 @@ const TaskContainer: FC<Props> = (props) => {
       draggable={true}
       onDragStart={(e) => {
         const offset = { x: e.clientX, y: e.clientY };
-        dispatch(dragStart({ offset, fromTasklistId: props.tasklistId, task: props.task }));
+        dispatch(dragStart({ offset, task: props.task }));
       }}
       onDrag={(e) => {
         const offset = { x: e.clientX, y: e.clientY };
