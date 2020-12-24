@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { useDispatch } from "react-redux";
 import { dragEnd, dragStart, updateOffset } from "../store/tasksDragSlice";
 import CompleteButton from "./CompleteButton";
+import { selectedTasksSlice } from "../store/selectedTasksSlice";
 
 type Props = {
   tasklistId: string;
@@ -38,6 +39,14 @@ const TaskContainer: FC<Props> = (props) => {
       onDragEnd={(e) => {
         const offset = { x: e.clientX, y: e.clientY };
         dispatch(dragEnd({ offset }));
+      }}
+      onClick={(e) => {
+        if (e.ctrlKey || e.metaKey)  {
+          dispatch(selectedTasksSlice.actions.addMany([props.task]));
+        } else {
+          dispatch(selectedTasksSlice.actions.removeAll());
+          dispatch(selectedTasksSlice.actions.addMany([props.task]));
+        }
       }}
     >
       <hr />
