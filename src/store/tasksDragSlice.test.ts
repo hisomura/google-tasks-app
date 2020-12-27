@@ -14,7 +14,7 @@ describe("tasksDragSlice", () => {
         payload: {
           offset: { x: 100, y: 100 },
           fromTasklistId: "from-task-list-id",
-          task: { title: "task 1", taskListId: "list 1" },
+          tasks: [{ title: "task 1", taskListId: "list 1" }],
         },
       }
     );

@@ -18,4 +18,6 @@ export const { addMany, removeMany, removeAll } = selectedTasksSlice.actions;
 export const isSelectedSelector = (id: string) => ({ selectedTasks }: { selectedTasks: EntityState<Task> }) =>
   selectedTasks.entities[id] !== undefined;
 
+export const selectedTasksSelector = ({ selectedTasks }: { selectedTasks: EntityState<Task> }) => Object.values(selectedTasks.entities)
+
 export default selectedTasksSlice.reducer;

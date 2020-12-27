@@ -21,11 +21,11 @@ export const tasksDragSlice = createSlice<DragState, SliceCaseReducers<DragState
     tasks: [],
   },
   reducers: {
-    dragStart: (state, action: { payload: { offset: Offset; task: Task } }) => {
+    dragStart: (state, action: { payload: { offset: Offset; tasks: Task[] } }) => {
       state.dragState = "dragging";
       state.initialClientOffset = action.payload.offset;
       state.currentClientOffset = action.payload.offset;
-      state.tasks.push(action.payload.task);
+      state.tasks = action.payload.tasks;
     },
     updateOffset: (state, action: { payload: { offset: Offset } }) => {
       state.currentClientOffset = action.payload.offset;
@@ -41,10 +41,13 @@ export const tasksDragSlice = createSlice<DragState, SliceCaseReducers<DragState
       const tasks = original<Task[]>(state.tasks);
       if (!tasks || tasks.length === 0) throw Error("'tasks' is empty.");
 
-      const toTasklistId = action.payload.toTasklistId;
-      moveTasksToAnotherTasklist(tasks, toTasklistId).then(() => {
-        queryClient.invalidateQueries(["tasklists", tasks[0].taskListId]);
-        queryClient.invalidateQueries(["tasklists", toTasklistId]);
+      const toTaskListId = action.payload.toTasklistId;
+      moveTasksToAnotherTasklist(tasks, toTaskListId).then(() => {
+        const taskListIds = new Set(tasks.map((task) => task.taskListId));
+        taskListIds.add(toTaskListId);
+        for (const taskListId of taskListIds) {
+          queryClient.invalidateQueries(["tasks", taskListId]);
+        }
       });
 
       // animation

@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { dragEnd, dragStart, updateOffset } from "../store/tasksDragSlice";
 import CompleteButton from "./CompleteButton";
-import { isSelectedSelector, selectedTasksSlice } from "../store/selectedTasksSlice";
+import { isSelectedSelector, selectedTasksSelector, selectedTasksSlice } from "../store/selectedTasksSlice";
 
 type Props = {
   tasklistId: string;
@@ -16,6 +16,8 @@ const TaskContainer: FC<Props> = (props) => {
   const dispatch = useDispatch();
   const [completed, setCompleted] = useState(false);
   const isSelected = useSelector(isSelectedSelector(props.task.id!));
+  const selectedTasks = useSelector(selectedTasksSelector) // FIXME remove
+
   const mutation = useMutation(
     (props: { tasklistId: string; task: Task }) => {
       setCompleted(true);
@@ -32,7 +34,7 @@ const TaskContainer: FC<Props> = (props) => {
       draggable={true}
       onDragStart={(e) => {
         const offset = { x: e.clientX, y: e.clientY };
-        dispatch(dragStart({ offset, task: props.task }));
+        dispatch(dragStart({ offset, tasks: selectedTasks }));
       }}
       onDrag={(e) => {
         const offset = { x: e.clientX, y: e.clientY };
