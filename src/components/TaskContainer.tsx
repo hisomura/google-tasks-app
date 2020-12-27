@@ -1,10 +1,10 @@
 import { FC, useState } from "react";
 import { Task, updateTaskCompleted } from "../lib/gapi-wrappers";
 import { useMutation, useQueryClient } from "react-query";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { dragEnd, dragStart, updateOffset } from "../store/tasksDragSlice";
 import CompleteButton from "./CompleteButton";
-import { selectedTasksSlice } from "../store/selectedTasksSlice";
+import { isSelectedSelector, selectedTasksSlice } from "../store/selectedTasksSlice";
 
 type Props = {
   tasklistId: string;
@@ -15,6 +15,7 @@ const TaskContainer: FC<Props> = (props) => {
   const client = useQueryClient();
   const dispatch = useDispatch();
   const [completed, setCompleted] = useState(false);
+  const isSelected = useSelector(isSelectedSelector(props.task.id!));
   const mutation = useMutation(
     (props: { tasklistId: string; task: Task }) => {
       setCompleted(true);
@@ -27,6 +28,7 @@ const TaskContainer: FC<Props> = (props) => {
 
   return (
     <div
+      style={ isSelected ? {backgroundColor: '#ccc'} : {}}
       draggable={true}
       onDragStart={(e) => {
         const offset = { x: e.clientX, y: e.clientY };

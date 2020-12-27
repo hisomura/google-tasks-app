@@ -34,7 +34,7 @@ function separateAndSortTasks(input: Task[]) {
 
 const TaskListContainer: FC<{ tasklist: TaskList }> = (props) => {
   const dispatch = useDispatch();
-  const { isLoading, data } = useQuery(["tasklists", props.tasklist.id], async () => {
+  const { isLoading, data } = useQuery(["tasks", props.tasklist.id], async () => {
     if (props.tasklist.id === undefined) return undefined;
     const tasks = await getTasks(props.tasklist.id);
     return tasks ?? [];
