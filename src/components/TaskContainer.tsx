@@ -45,11 +45,11 @@ const TaskContainer: FC<Props> = (props) => {
         dispatch(dragEnd({ offset }));
       }}
       onClick={(e) => {
+        e.preventDefault();
         if (e.ctrlKey || e.metaKey)  {
-          dispatch(selectedTasksSlice.actions.addMany([props.task]));
+          dispatch(selectedTasksSlice.actions.addOne(props.task));
         } else {
-          dispatch(selectedTasksSlice.actions.removeAll());
-          dispatch(selectedTasksSlice.actions.addMany([props.task]));
+          dispatch(selectedTasksSlice.actions.removeAllAndAddOne(props.task))
         }
       }}
     >
