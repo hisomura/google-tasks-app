@@ -1,4 +1,5 @@
 import ReactDOM from "react-dom";
+import { StrictMode } from "react";
 import App from "./App";
 import "./index.css";
 import { Provider } from "react-redux";
@@ -9,7 +10,7 @@ import { GapiAuthProvider } from "./lib/GapiAuthProvider";
 import { queryClient } from "./globals";
 
 ReactDOM.render(
-  <>
+  <StrictMode>
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <GapiAuthProvider>
@@ -17,6 +18,6 @@ ReactDOM.render(
         </GapiAuthProvider>
       </QueryClientProvider>
     </Provider>
-  </>,
+  </StrictMode>,
   document.getElementById("root")
 );
