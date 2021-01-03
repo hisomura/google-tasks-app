@@ -3,7 +3,7 @@ import { useQuery } from "react-query";
 import { getTasks, Task, TaskList } from "../lib/gapi-wrappers";
 import TaskContainer from "./TaskContainer";
 import { useDispatch } from "react-redux";
-import tasksDragSlice from "../store/tasksDragSlice";
+import { drop } from "../store/tasksDragSlice";
 
 const taskSortFunc = (a: Task, b: Task) => parseInt(a.position!) - parseInt(b.position!);
 
@@ -65,7 +65,7 @@ const TaskListContainer: FC<{ tasklist: TaskList }> = (props) => {
       onDrop={(e) => {
         e.preventDefault();
         const offset = { x: e.clientX, y: e.clientY };
-        dispatch(tasksDragSlice.actions.drop({ offset: offset, toTasklistId: props.tasklist.id }));
+        dispatch(drop(offset, props.tasklist.id!));
       }}
     >
       <p className="break-words pl-3 font-bold text-lg">{props.tasklist.title}</p>

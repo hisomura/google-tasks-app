@@ -1,6 +1,5 @@
 import { createSlice, SliceCaseReducers } from "@reduxjs/toolkit";
 import { moveTasksToAnotherTasklist, Task } from "../lib/gapi-wrappers";
-import { original } from "immer";
 import { queryClient } from "../globals";
 
 type Offset = { x: number; y: number };
@@ -30,27 +29,9 @@ export const tasksDragSlice = createSlice<DragState, SliceCaseReducers<DragState
     updateOffset: (state, action: { payload: { offset: Offset } }) => {
       state.currentClientOffset = action.payload.offset;
     },
-
-    drop: (state, action: { payload: { offset: Offset; toTasklistId: string } }) => {
+    dropProcessStart: (state, action: { payload: { offset: Offset; toTasklistId: string } }) => {
       state.dragState = "drop-animation";
       state.currentClientOffset = action.payload.offset;
-      console.log("drop payload:  ", action.payload);
-      console.log(action.payload.toTasklistId);
-      console.log(action.payload.offset);
-
-      const tasks = original<Task[]>(state.tasks);
-      if (!tasks || tasks.length === 0) throw Error("'tasks' is empty.");
-
-      const toTaskListId = action.payload.toTasklistId;
-      moveTasksToAnotherTasklist(tasks, toTaskListId).then(() => {
-        const taskListIds = new Set(tasks.map((task) => task.taskListId));
-        taskListIds.add(toTaskListId);
-        for (const taskListId of taskListIds) {
-          queryClient.invalidateQueries(["tasks", taskListId]);
-        }
-      });
-
-      // animation
     },
     dragEnd: (state, action: { payload: { offset: Offset } }) => {
       state.dragState = "cancel-animation";
@@ -69,6 +50,22 @@ export const tasksDragSlice = createSlice<DragState, SliceCaseReducers<DragState
   },
 });
 
-export const { dragStart, updateOffset, drop, dragEnd } = tasksDragSlice.actions;
+export const { dragStart, updateOffset, dragEnd } = tasksDragSlice.actions;
 
 export default tasksDragSlice;
+
+export const drop = (offset: Offset, toTaskListId: string) => async (dispatch: Function, getState: Function) => {
+  dispatch(tasksDragSlice.actions.dropProcessStart({ offset, toTasklistId: toTaskListId }));
+  const tasks = getState()["tasksDrag"].tasks as Task[];
+  if (!tasks || tasks.length === 0) throw Error("'tasks' is empty.");
+
+  await moveTasksToAnotherTasklist(tasks, toTaskListId);
+  const taskListIds = new Set(tasks.map((task) => task.taskListId));
+  taskListIds.add(toTaskListId);
+
+  const promises = Array.from(taskListIds).map((taskListId) => queryClient.invalidateQueries(["tasks", taskListId]));
+  await Promise.all(promises)
+
+  // animation
+  dispatch(tasksDragSlice.actions.initTaskDragState({}));
+};
