@@ -1,6 +1,6 @@
 import { createSlice, SliceCaseReducers } from "@reduxjs/toolkit";
 import { moveTasksToAnotherTasklist, Task } from "../lib/gapi-wrappers";
-import { queryClient } from "../globals";
+import { QueryClient } from "react-query";
 
 type Offset = { x: number; y: number };
 
@@ -54,7 +54,8 @@ export const { dragStart, updateOffset, dragEnd } = tasksDragSlice.actions;
 
 export default tasksDragSlice;
 
-export const drop = (offset: Offset, toTaskListId: string) => async (dispatch: Function, getState: Function) => {
+export const drop = (offset: Offset, toTaskListId: string) => async (dispatch: Function, getState: Function, extras: {queryClient: QueryClient}) => {
+  console.log(extras)
   dispatch(tasksDragSlice.actions.dropProcessStart({ offset, toTasklistId: toTaskListId }));
   const tasks = getState()["tasksDrag"].tasks as Task[];
   if (!tasks || tasks.length === 0) throw Error("'tasks' is empty.");
@@ -63,7 +64,7 @@ export const drop = (offset: Offset, toTaskListId: string) => async (dispatch: F
   const taskListIds = new Set(tasks.map((task) => task.taskListId));
   taskListIds.add(toTaskListId);
 
-  const promises = Array.from(taskListIds).map((taskListId) => queryClient.invalidateQueries(["tasks", taskListId]));
+  const promises = Array.from(taskListIds).map((taskListId) => extras.queryClient.invalidateQueries(["tasks", taskListId]));
   await Promise.all(promises)
 
   // animation
