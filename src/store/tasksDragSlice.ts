@@ -60,14 +60,13 @@ export const drop = (offset: Offset, toTaskListId: string) => async (
   getState: Function,
   extras: { queryClient: QueryClient }
 ) => {
-  console.log(extras);
   dispatch(tasksDragSlice.actions.dropProcessStart({ offset, toTasklistId: toTaskListId }));
-  const tasks = getState()["tasksDrag"].tasks as Task[];
-  if (!tasks || tasks.length === 0) throw Error("'tasks' is empty.");
-
-  console.log(getAllTasksFromQueryClient(queryClient));
+  const taskIds = (getState()["tasksDrag"].tasks as Task[]).map((task) => task.id!);
+  const tasks = getTasksByIdsFromQueryClient(queryClient, taskIds);
+  console.log(tasks);
   await moveTasksToAnotherTasklist(tasks, toTaskListId);
-  const taskListIds = new Set(tasks.map((task) => task.taskListId));
+
+  const taskListIds = new Set(tasks.map((task) => task.taskListId!));
   taskListIds.add(toTaskListId);
 
   const promises = Array.from(taskListIds).map((taskListId) =>
@@ -79,11 +78,14 @@ export const drop = (offset: Offset, toTaskListId: string) => async (
   dispatch(tasksDragSlice.actions.initTaskDragState({}));
 };
 
-function getAllTasksFromQueryClient(queryClient: QueryClient) {
-  return queryClient
+function getTasksByIdsFromQueryClient(queryClient: QueryClient, ids: string[]) {
+  // TODO remove ts-ignore
+  // @ts-ignore
+  const allTasks = queryClient
     .getQueryCache()
     .findAll("tasks")
     // TODO remove ts-ignore
     // @ts-ignore
-    .reduce((acc, query) => [...acc, ...query.state.data], []);
+    .reduce((acc, query) => [...acc, ...query.state.data], []) as Task[];
+  return allTasks.filter((task) => ids.includes(task.id!));
 }
