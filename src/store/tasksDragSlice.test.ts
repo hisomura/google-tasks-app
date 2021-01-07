@@ -7,20 +7,20 @@ describe("tasksDragSlice", () => {
         dragState: "yet-started",
         initialClientOffset: null,
         currentClientOffset: null,
-        tasks: [],
+        taskIds: [],
       },
       {
         type: dragStart.type,
         payload: {
           offset: { x: 100, y: 100 },
           fromTasklistId: "from-task-list-id",
-          tasks: [{ title: "task 1", taskListId: "list 1" }],
+          taskIds: ['task 1', 'task 2'],
         },
       }
     );
     expect(nextState.dragState).toBe("dragging");
     expect(nextState.initialClientOffset).toEqual({ x: 100, y: 100 });
     expect(nextState.currentClientOffset).toEqual({ x: 100, y: 100 });
-    expect(nextState.tasks).toEqual([{ title: "task 1", taskListId: "list 1" }]);
+    expect(nextState.taskIds).toEqual(['task 1', 'task 2']);
   });
 });

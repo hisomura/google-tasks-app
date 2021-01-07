@@ -9,7 +9,7 @@ export type DragState = {
   dragState: "yet-started" | "dragging" | "drop-animation" | "cancel-animation";
   initialClientOffset: Offset | null;
   currentClientOffset: Offset | null;
-  tasks: Task[];
+  taskIds: string[];
 };
 
 export const tasksDragSlice = createSlice<DragState, SliceCaseReducers<DragState>>({
@@ -18,14 +18,14 @@ export const tasksDragSlice = createSlice<DragState, SliceCaseReducers<DragState
     dragState: "yet-started",
     initialClientOffset: null,
     currentClientOffset: null,
-    tasks: [],
+    taskIds: [],
   },
   reducers: {
-    dragStart: (state, action: { payload: { offset: Offset; tasks: Task[] } }) => {
+    dragStart: (state, action: { payload: { offset: Offset; taskIds: string[] } }) => {
       state.dragState = "dragging";
       state.initialClientOffset = action.payload.offset;
       state.currentClientOffset = action.payload.offset;
-      state.tasks = action.payload.tasks;
+      state.taskIds = action.payload.taskIds;
     },
     updateOffset: (state, action: { payload: { offset: Offset } }) => {
       state.currentClientOffset = action.payload.offset;
@@ -38,7 +38,7 @@ export const tasksDragSlice = createSlice<DragState, SliceCaseReducers<DragState
       state.dragState = "cancel-animation";
       state.initialClientOffset = action.payload.offset;
       state.currentClientOffset = action.payload.offset;
-      state.tasks = [];
+      state.taskIds = [];
 
       // animation
     },
@@ -46,7 +46,7 @@ export const tasksDragSlice = createSlice<DragState, SliceCaseReducers<DragState
       state.dragState = "yet-started";
       state.initialClientOffset = null;
       state.currentClientOffset = null;
-      state.tasks = [];
+      state.taskIds = [];
     },
   },
 });
@@ -61,7 +61,7 @@ export const drop = (offset: Offset, toTaskListId: string) => async (
   extras: { queryClient: QueryClient }
 ) => {
   dispatch(tasksDragSlice.actions.dropProcessStart({ offset, toTasklistId: toTaskListId }));
-  const taskIds = (getState()["tasksDrag"].tasks as Task[]).map((task) => task.id!);
+  const taskIds = getState()["tasksDrag"].taskIds as string[];
   const tasks = getTasksByIdsFromQueryClient(queryClient, taskIds);
   console.log(tasks);
   await moveTasksToAnotherTasklist(tasks, toTaskListId);
