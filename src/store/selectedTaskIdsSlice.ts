@@ -1,14 +1,24 @@
 import { createSlice, SliceCaseReducers } from "@reduxjs/toolkit";
 
-const selectedTaskIdsSlice = createSlice<string[], SliceCaseReducers<string[]>>({
+type State = { [key: string]: string };
+
+const selectedTaskIdsSlice = createSlice<State, SliceCaseReducers<State>>({
   name: "selectedTaskIds",
-  initialState: [],
+  initialState: {},
   reducers: {
     addMany: (state, action: { payload: string[] }) => {
-      return Array.from(new Set(action.payload.concat(state)));
+      action.payload.forEach((id) => {
+        state[id] = id;
+      });
     },
-    removeAll: () => [],
-    replaceAll: (state, action: { payload: string[] }) => Array.from(new Set(action.payload)),
+    removeAll: () => ({}),
+    replaceAll: (state, action: { payload: string[] }) => {
+      const newState: State = {};
+      action.payload.forEach((id) => {
+        newState[id] = id;
+      });
+      return newState;
+    },
   },
 });
 
