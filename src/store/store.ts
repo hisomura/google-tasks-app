@@ -1,10 +1,10 @@
 import { combineReducers, configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import tasksDragSlice from "./tasksDragSlice";
-import { selectedTasksSlice } from "./selectedTasksSlice";
 import { queryClient } from "../globals";
+import selectedTaskIdsSlice from "./selectedTaskIdsSlice";
 
 export const rootReducer = combineReducers({
-  selectedTasks: selectedTasksSlice.reducer,
+  selectedTaskIds: selectedTaskIdsSlice,
   tasksDrag: tasksDragSlice.reducer,
 });
 

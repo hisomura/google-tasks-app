@@ -25,3 +25,10 @@ const selectedTaskIdsSlice = createSlice<State, SliceCaseReducers<State>>({
 export const { addTaskIds, removeAllTaskIds, replaceAllTaskIds } = selectedTaskIdsSlice.actions;
 
 export default selectedTaskIdsSlice.reducer;
+
+export const isSelectedSelector = (id: string) => (rootState: { selectedTaskIds: State }) =>
+  id in rootState.selectedTaskIds;
+
+// TODO remove
+export const selectedTaskIdsSelector = ({ selectedTaskIds }: { selectedTaskIds: State }) =>
+  Object.values(selectedTaskIds);

@@ -2,7 +2,7 @@ import { FC } from "react";
 import { useQuery } from "react-query";
 import TaskListContainer from "./TaskListContainer";
 import { getTasklists, signOut } from "../lib/gapi-wrappers";
-import { selectedTasksSlice } from "../store/selectedTasksSlice";
+import { removeAllTaskIds } from "../store/selectedTaskIdsSlice";
 import { useDispatch } from "react-redux";
 
 const Board: FC = () => {
@@ -16,7 +16,7 @@ const Board: FC = () => {
       onClick={(e) => {
         if(e.isDefaultPrevented()) return
 
-        dispatch(selectedTasksSlice.actions.removeAll());
+        dispatch(removeAllTaskIds({}));
       }}
     >
       <button type="button" onClick={signOut} className="m-8 border">

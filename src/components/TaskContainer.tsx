@@ -4,7 +4,12 @@ import { useMutation, useQueryClient } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { dragEnd, dragStart, updateOffset } from "../store/tasksDragSlice";
 import CompleteButton from "./CompleteButton";
-import { isSelectedSelector, selectedTasksSelector, selectedTasksSlice } from "../store/selectedTasksSlice";
+import {
+  addTaskIds,
+  isSelectedSelector,
+  replaceAllTaskIds,
+  selectedTaskIdsSelector,
+} from "../store/selectedTaskIdsSlice";
 
 type Props = {
   tasklistId: string;
@@ -16,7 +21,7 @@ const TaskContainer: FC<Props> = (props) => {
   const dispatch = useDispatch();
   const [completed, setCompleted] = useState(false);
   const isSelected = useSelector(isSelectedSelector(props.task.id!));
-  const selectedTasks = useSelector(selectedTasksSelector) // FIXME remove
+  const selectedTaskIds = useSelector(selectedTaskIdsSelector); // FIXME remove
 
   const mutation = useMutation(
     (props: { tasklistId: string; task: Task }) => {
@@ -30,12 +35,11 @@ const TaskContainer: FC<Props> = (props) => {
 
   return (
     <div
-      style={ isSelected ? {backgroundColor: '#ccc'} : {}}
+      style={isSelected ? { backgroundColor: "#ccc" } : {}}
       draggable={true}
       onDragStart={(e) => {
         const offset = { x: e.clientX, y: e.clientY };
-        const taskIds = selectedTasks.filter((task): task is Task => task !== undefined).map((task) => task.id);
-        dispatch(dragStart({ offset, taskIds }));
+        dispatch(dragStart({ offset, taskIds: selectedTaskIds }));
       }}
       onDrag={(e) => {
         const offset = { x: e.clientX, y: e.clientY };
@@ -47,10 +51,10 @@ const TaskContainer: FC<Props> = (props) => {
       }}
       onClick={(e) => {
         e.preventDefault();
-        if (e.ctrlKey || e.metaKey)  {
-          dispatch(selectedTasksSlice.actions.addOne(props.task));
+        if (e.ctrlKey || e.metaKey) {
+          dispatch(addTaskIds([props.task.id]));
         } else {
-          dispatch(selectedTasksSlice.actions.removeAllAndAddOne(props.task))
+          dispatch(replaceAllTaskIds([props.task.id]));
         }
       }}
     >
