@@ -6,13 +6,13 @@ const selectedTaskIdsSlice = createSlice<State, SliceCaseReducers<State>>({
   name: "selectedTaskIds",
   initialState: {},
   reducers: {
-    addMany: (state, action: { payload: string[] }) => {
+    addTaskIds: (state, action: { payload: string[] }) => {
       action.payload.forEach((id) => {
         state[id] = id;
       });
     },
-    removeAll: () => ({}),
-    replaceAll: (state, action: { payload: string[] }) => {
+    removeAllTaskIds: () => ({}),
+    replaceAllTaskIds: (state, action: { payload: string[] }) => {
       const newState: State = {};
       action.payload.forEach((id) => {
         newState[id] = id;
@@ -22,6 +22,6 @@ const selectedTaskIdsSlice = createSlice<State, SliceCaseReducers<State>>({
   },
 });
 
-export const { addMany, removeAll, replaceAll } = selectedTaskIdsSlice.actions;
+export const { addTaskIds, removeAllTaskIds, replaceAllTaskIds } = selectedTaskIdsSlice.actions;
 
 export default selectedTaskIdsSlice.reducer;
