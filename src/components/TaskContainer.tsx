@@ -7,6 +7,7 @@ import CompleteButton from "./CompleteButton";
 import {
   addTaskIds,
   isSelectedSelector,
+  removeAllTaskIds,
   replaceAllTaskIds,
   selectedTaskIdsSelector,
 } from "../store/selectedTaskIdsSlice";
@@ -44,7 +45,7 @@ const TaskContainer: FC<Props> = (props) => {
           dispatch(dragStart({ offset, taskIds: selectedTaskIds }));
         } else {
           dispatch(replaceAllTaskIds([props.task.id]));
-          dispatch(dragStart({ offset, taskIds: [props.task.id]}));
+          dispatch(dragStart({ offset, taskIds: [props.task.id] }));
         }
       }}
       onDrag={(e) => {
@@ -56,6 +57,7 @@ const TaskContainer: FC<Props> = (props) => {
         dispatch(dragEnd({ offset }));
       }}
       onClick={(e) => {
+        if (e.defaultPrevented) return;
         e.preventDefault();
         if (e.ctrlKey || e.metaKey) {
           dispatch(addTaskIds([props.task.id]));
@@ -67,7 +69,13 @@ const TaskContainer: FC<Props> = (props) => {
       <hr />
       <div className="flex items-center p-3">
         <div className="flex-initial mr-3">
-          <CompleteButton onClick={() => mutation.mutate({ tasklistId: props.tasklistId, task: props.task })} />
+          <CompleteButton
+            onClick={(e) => {
+              e.preventDefault();
+              mutation.mutate({ tasklistId: props.tasklistId, task: props.task });
+              dispatch(removeAllTaskIds({}));
+            }}
+          />
         </div>
         <div className="flex-initial break-all" style={{ textDecorationLine: completed ? "line-through" : "none" }}>
           {props.task.title}
