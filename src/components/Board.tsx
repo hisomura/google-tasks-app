@@ -12,13 +12,7 @@ const Board: FC = () => {
   if (isLoading) return <>"Loading..."</>;
 
   return (
-    <div
-      onClick={(e) => {
-        if(e.isDefaultPrevented()) return
-
-        dispatch(removeAllTaskIds({}));
-      }}
-    >
+    <div onClick={() => dispatch(removeAllTaskIds({}))}>
       <button type="button" onClick={signOut} className="m-8 border">
         Sign out.
       </button>

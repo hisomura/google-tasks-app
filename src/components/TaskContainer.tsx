@@ -48,17 +48,13 @@ const TaskContainer: FC<Props> = (props) => {
           dispatch(dragStart({ offset, taskIds: [props.task.id] }));
         }
       }}
-      onDrag={(e) => {
-        const offset = { x: e.clientX, y: e.clientY };
-        dispatch(updateOffset({ offset }));
-      }}
+      onDrag={(e) => dispatch(updateOffset({ offset: { x: e.clientX, y: e.clientY } }))}
       onDragEnd={(e) => {
         const offset = { x: e.clientX, y: e.clientY };
         dispatch(dragEnd({ offset }));
       }}
       onClick={(e) => {
-        if (e.defaultPrevented) return;
-        e.preventDefault();
+        e.stopPropagation();
         if (e.ctrlKey || e.metaKey) {
           dispatch(addTaskIds([props.task.id]));
         } else {
@@ -72,7 +68,7 @@ const TaskContainer: FC<Props> = (props) => {
         <div className="flex-initial mr-3">
           <CompleteButton
             onClick={(e) => {
-              e.preventDefault();
+              e.stopPropagation();
               mutation.mutate({ tasklistId: props.tasklistId, task: props.task });
               dispatch(removeAllTaskIds({}));
             }}
