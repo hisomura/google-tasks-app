@@ -65,6 +65,7 @@ const TaskContainer: FC<Props> = (props) => {
           dispatch(replaceAllTaskIds([props.task.id]));
         }
       }}
+      onMouseDown={(e) => e.stopPropagation()}
     >
       <hr />
       <div className="flex items-center p-3">
