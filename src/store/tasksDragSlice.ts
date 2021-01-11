@@ -13,7 +13,7 @@ export type DragState = {
 };
 
 export const tasksDragSlice = createSlice<DragState, SliceCaseReducers<DragState>>({
-  name: "taskDrag",
+  name: "tasksDrag",
   initialState: {
     dragState: "yet-started",
     initialClientOffset: null,
