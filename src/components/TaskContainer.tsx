@@ -29,6 +29,8 @@ const TaskContainer: FC<Props> = (props) => {
 
   return (
     <div
+      className={"task-container"}
+      data-task-id={props.task.id}
       style={isSelected ? { backgroundColor: "#ccc" } : {}}
       draggable={true}
       onDragStart={(e) => {

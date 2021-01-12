@@ -1,4 +1,6 @@
 import React, { FC, useState } from "react";
+import { useDispatch } from "react-redux";
+import { replaceAllTaskIds } from "../store/selectedTaskIdsSlice";
 
 const parentStyle: React.CSSProperties = {
   position: "relative",
@@ -28,8 +30,15 @@ type RectangleState = {
   currentY: number;
 };
 
+function getRectangleVertexes(state: RectangleState) {
+  const [left, right] = state.startX < state.currentX ? [state.startX, state.currentX] : [state.currentX, state.startX];
+  const [top, bottom] = state.startY < state.currentY ? [state.startY, state.currentY] : [state.currentY, state.startY];
+  return { left, right, top, bottom };
+}
+
 const RectangleSelection: FC = ({ children }) => {
   const [rectangleState, setRectangleState] = useState<RectangleState | null>(null);
+  const dispatch = useDispatch();
   return (
     <div
       style={parentStyle}
@@ -47,7 +56,24 @@ const RectangleSelection: FC = ({ children }) => {
         setRectangleState({ ...rectangleState, currentX: e.clientX, currentY: e.clientY });
       }}
       onMouseUp={(_e) => {
-        // TODO implement
+        const taskNodeList = document.querySelectorAll<HTMLDivElement>(".task-container");
+        if (!rectangleState) throw new Error("No task nodes");
+        const rectangleVertexes = getRectangleVertexes(rectangleState);
+        const taskIds: string[] = [];
+
+        taskNodeList.forEach((taskNode) => {
+          const rect = taskNode.getBoundingClientRect();
+          if (
+            rectangleVertexes.left <= rect.left &&
+            rect.right <= rectangleVertexes.right &&
+            rectangleVertexes.top < rect.top &&
+            rect.bottom < rectangleVertexes.bottom
+          ) {
+            taskIds.push(taskNode.dataset["taskId"]!);
+          }
+        });
+
+        dispatch(replaceAllTaskIds(taskIds));
         setRectangleState(null);
       }}
     >
