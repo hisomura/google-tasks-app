@@ -17,15 +17,9 @@ const TaskContainer: FC<Props> = (props) => {
   const [completed, setCompleted] = useState(false);
   const isSelected = useSelector(isSelectedSelector(props.task.id!));
 
-  const mutation = useMutation(
-    (props: { tasklistId: string; task: Task }) => {
-      setCompleted(true);
-      return updateTaskCompleted({ tasklistId: props.tasklistId, task: props.task });
-    },
-    {
-      onSuccess: () => client.invalidateQueries(["tasklists", props.tasklistId]),
-    }
-  );
+  const mutation = useMutation((props: { task: Task }) => updateTaskCompleted({ task: props.task }), {
+    onSuccess: () => client.invalidateQueries(["tasks", props.task.taskListId]),
+  });
 
   return (
     <div
@@ -59,7 +53,8 @@ const TaskContainer: FC<Props> = (props) => {
           <CompleteButton
             onClick={(e) => {
               e.stopPropagation();
-              mutation.mutate({ tasklistId: props.tasklistId, task: props.task });
+              setCompleted(true);
+              mutation.mutate({ task: props.task });
               dispatch(removeAllTaskIds({}));
             }}
           />

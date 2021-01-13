@@ -34,7 +34,7 @@ const Div = styled.div`
 
 const CompleteButton: FC<{ onClick: MouseEventHandler<HTMLDivElement> }> = (props) => {
   return (
-    <Div onClick={props.onClick}>
+    <Div onClick={props.onClick} onMouseUp={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
       <MdPanoramaFishEye />
       <MdDone />
     </Div>
