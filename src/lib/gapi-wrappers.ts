@@ -57,11 +57,11 @@ export async function moveTasksToAnotherTasklist(tasks: Task[], toTaskListId: st
   await Promise.all(promises);
 }
 
-export async function updateTaskCompleted({ task }: { task: Task }) {
-  await gapi.client.tasks.tasks.update({
+export async function completeTask({ task }: { task: Task }) {
+  await gapi.client.tasks.tasks.patch({
     tasklist: task.taskListId,
     task: task.id!,
-    resource: { ...task, status: "completed" },
+    resource: { status: "completed" },
   });
   return gapi.client.tasks.tasks.clear({
     tasklist: task.taskListId,

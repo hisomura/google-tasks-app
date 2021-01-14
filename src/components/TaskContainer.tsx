@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { Task, updateTaskCompleted } from "../lib/gapi-wrappers";
+import { Task, completeTask } from "../lib/gapi-wrappers";
 import { useMutation, useQueryClient } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { dragEnd, dragStart, updateOffset } from "../store/tasksDragSlice";
@@ -17,7 +17,7 @@ const TaskContainer: FC<Props> = (props) => {
   const [completed, setCompleted] = useState(false);
   const isSelected = useSelector(isSelectedSelector(props.task.id!));
 
-  const mutation = useMutation((props: { task: Task }) => updateTaskCompleted({ task: props.task }), {
+  const mutation = useMutation((props: { task: Task }) => completeTask({ task: props.task }), {
     onSuccess: () => client.invalidateQueries(["tasks", props.task.taskListId]),
   });
 
