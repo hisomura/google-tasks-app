@@ -49,12 +49,12 @@ export function signOut() {
 
 export async function moveTasksToAnotherTasklist(tasks: Task[], toTaskListId: string) {
   console.log(tasks, toTaskListId);
-  const promises: Promise<any>[] = [];
+  const batch = gapi.client.newBatch();
   tasks.forEach((task) => {
-    promises.push(gapi.client.tasks.tasks.delete({ tasklist: task.taskListId, task: task.id! }));
-    promises.push(gapi.client.tasks.tasks.insert({ tasklist: toTaskListId, resource: task }));
+    batch.add(gapi.client.tasks.tasks.delete({ tasklist: task.taskListId, task: task.id! }));
+    batch.add(gapi.client.tasks.tasks.insert({ tasklist: toTaskListId, resource: task }));
   });
-  await Promise.all(promises);
+  return batch.then();
 }
 
 export async function completeTask({ task }: { task: Task }) {
