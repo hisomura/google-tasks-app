@@ -7,6 +7,8 @@ describe("tasksDragSlice", () => {
         dragState: "yet-started",
         initialClientOffset: null,
         currentClientOffset: null,
+        toTaskListId: null,
+        previousTaskId: null
       },
       {
         type: dragStart.type,

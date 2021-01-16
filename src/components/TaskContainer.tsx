@@ -1,8 +1,8 @@
 import { FC, useState } from "react";
-import { Task, completeTask } from "../lib/gapi-wrappers";
+import { completeTask, Task } from "../lib/gapi-wrappers";
 import { useMutation, useQueryClient } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
-import { dragEnd, dragStart, updateOffset } from "../store/tasksDragSlice";
+import { dragEnd, dragStart, updateDragState, updateOffset } from "../store/tasksDragSlice";
 import CompleteButton from "./CompleteButton";
 import { addTaskIds, isSelectedSelector, removeAllTaskIds, replaceAllTaskIds } from "../store/selectedTaskIdsSlice";
 
@@ -33,6 +33,14 @@ const TaskContainer: FC<Props> = (props) => {
         dispatch(dragStart({ offset: { x: e.clientX, y: e.clientY } }));
       }}
       onDrag={(e) => dispatch(updateOffset({ offset: { x: e.clientX, y: e.clientY } }))}
+      onDragOver={(_e) => {
+        dispatch(
+          updateDragState({
+            toTaskListId: props.tasklistId,
+            previousTaskId: props.task.id,
+          })
+        );
+      }}
       onDragEnd={(e) => {
         const offset = { x: e.clientX, y: e.clientY };
         dispatch(dragEnd({ offset }));

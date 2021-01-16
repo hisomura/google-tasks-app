@@ -5,24 +5,32 @@ import { removeAllTaskIds } from "./selectedTaskIdsSlice";
 
 type Offset = { x: number; y: number };
 
-export type TaskDragState = {
+export type TasksDragState = {
   dragState: "yet-started" | "dragging" | "drop-animation" | "cancel-animation";
   initialClientOffset: Offset | null;
   currentClientOffset: Offset | null;
+  toTaskListId: string | null,
+  previousTaskId: string | null
 };
 
-export const tasksDragSlice = createSlice<TaskDragState, SliceCaseReducers<TaskDragState>>({
+export const tasksDragSlice = createSlice<TasksDragState, SliceCaseReducers<TasksDragState>>({
   name: "tasksDrag",
   initialState: {
     dragState: "yet-started",
     initialClientOffset: null,
     currentClientOffset: null,
+    toTaskListId: null,
+    previousTaskId: null,
   },
   reducers: {
     dragStart: (state, action: { payload: { offset: Offset } }) => {
       state.dragState = "dragging";
       state.initialClientOffset = action.payload.offset;
       state.currentClientOffset = action.payload.offset;
+    },
+    updateDragState: (state, action: { payload: { toTaskListId?: string, previousTaskId?: string } }) => {
+      state.toTaskListId = action.payload.toTaskListId ?? null;
+      state.previousTaskId = action.payload.previousTaskId ?? null;
     },
     updateOffset: (state, action: { payload: { offset: Offset } }) => {
       state.currentClientOffset = action.payload.offset;
@@ -42,11 +50,13 @@ export const tasksDragSlice = createSlice<TaskDragState, SliceCaseReducers<TaskD
       state.dragState = "yet-started";
       state.initialClientOffset = null;
       state.currentClientOffset = null;
+      state.toTaskListId = null;
+      state.previousTaskId = null;
     },
   },
 });
 
-export const { dragStart, updateOffset, dragEnd } = tasksDragSlice.actions;
+export const { dragStart, updateDragState, updateOffset, dragEnd } = tasksDragSlice.actions;
 
 export default tasksDragSlice;
 
