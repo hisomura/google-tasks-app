@@ -60,6 +60,9 @@ export const { dragStart, updateDragState, updateOffset, dragEnd } = tasksDragSl
 
 export default tasksDragSlice;
 
+export const isDragTarget = (taskListId: string, previousTaskId: string | null) => (rootState: { tasksDrag: TasksDragState }) =>
+  rootState.tasksDrag.toTaskListId === taskListId && rootState.tasksDrag.previousTaskId === previousTaskId
+
 export const drop = (offset: Offset, toTaskListId: string) => async (
   dispatch: Function,
   getState: Function,

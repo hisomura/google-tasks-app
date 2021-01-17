@@ -7,7 +7,8 @@ import CompleteButton from "./CompleteButton";
 import { addTaskIds, isSelectedSelector, removeAllTaskIds, replaceAllTaskIds } from "../store/selectedTaskIdsSlice";
 
 type Props = {
-  tasklistId: string;
+  taskListId: string;
+  previousTaskId?: string;
   task: Task;
 };
 
@@ -33,11 +34,14 @@ const TaskContainer: FC<Props> = (props) => {
         dispatch(dragStart({ offset: { x: e.clientX, y: e.clientY } }));
       }}
       onDrag={(e) => dispatch(updateOffset({ offset: { x: e.clientX, y: e.clientY } }))}
-      onDragOver={(_e) => {
+      onDragOver={(e) => {
+        // e.preventDefault();
+        const rect = (e.target as HTMLDivElement).getBoundingClientRect();
+        const previousTaskFocused = (rect.top + rect.height / 2) > e.clientY;
         dispatch(
           updateDragState({
-            toTaskListId: props.tasklistId,
-            previousTaskId: props.task.id,
+            toTaskListId: props.taskListId,
+            previousTaskId: previousTaskFocused ? props.previousTaskId : props.task.id,
           })
         );
       }}
@@ -55,7 +59,6 @@ const TaskContainer: FC<Props> = (props) => {
       }}
       onMouseDown={(e) => e.stopPropagation()}
     >
-      <hr />
       <div className="flex items-center p-3">
         <div className="flex-initial mr-3">
           <CompleteButton

@@ -1,9 +1,10 @@
-import { FC } from "react";
+import { FC, Fragment } from "react";
 import { useQuery } from "react-query";
 import { getTasks, Task, TaskList } from "../lib/gapi-wrappers";
 import TaskContainer from "./TaskContainer";
 import { useDispatch } from "react-redux";
 import { drop } from "../store/tasksDragSlice";
+import TaskDragTargetLine from "./TaskDragTargetLine";
 
 const taskSortFunc = (a: Task, b: Task) => parseInt(a.position!) - parseInt(b.position!);
 
@@ -69,8 +70,12 @@ const TaskListContainer: FC<{ tasklist: TaskList }> = (props) => {
       }}
     >
       <p className="break-words pl-3 font-bold text-lg">{props.tasklist.title}</p>
-      {tasks.map((task) => (
-        <TaskContainer key={task.id} tasklistId={props.tasklist.id!} task={task} />
+      <TaskDragTargetLine taskListId={props.tasklist.id!} />
+      {tasks.map((task, index) => (
+        <Fragment key={task.id}>
+          <TaskContainer taskListId={props.tasklist.id!} previousTaskId={tasks[index-1]?.id} task={task} />
+          <TaskDragTargetLine taskListId={props.tasklist.id!} previousTaskId={task.id} />
+        </Fragment>
       ))}
     </div>
   );
