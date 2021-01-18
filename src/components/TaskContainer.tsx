@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import { completeTask, Task } from "../lib/gapi-wrappers";
 import { useMutation, useQueryClient } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
-import { dragEnd, dragStart, updateDragState, updateOffset } from "../store/tasksDragSlice";
+import { dragEnd, dragStart, updateOffset, updateTarget } from "../store/tasksDragSlice";
 import CompleteButton from "./CompleteButton";
 import { addTaskIds, isSelectedSelector, removeAllTaskIds, replaceAllTaskIds } from "../store/selectedTaskIdsSlice";
 
@@ -33,13 +33,16 @@ const TaskContainer: FC<Props> = (props) => {
 
         dispatch(dragStart({ offset: { x: e.clientX, y: e.clientY } }));
       }}
-      onDrag={(e) => dispatch(updateOffset({ offset: { x: e.clientX, y: e.clientY } }))}
+      onDrag={(e) => {
+        dispatch(updateOffset({ offset: { x: e.clientX, y: e.clientY } }))
+        e.preventDefault();
+      }}
       onDragOver={(e) => {
         // e.preventDefault();
         const rect = (e.target as HTMLDivElement).getBoundingClientRect();
-        const previousTaskFocused = (rect.top + rect.height / 2) > e.clientY;
+        const previousTaskFocused = rect.top + rect.height / 2 > e.clientY;
         dispatch(
-          updateDragState({
+          updateTarget({
             toTaskListId: props.taskListId,
             previousTaskId: previousTaskFocused ? props.previousTaskId : props.task.id,
           })

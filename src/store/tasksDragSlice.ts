@@ -9,8 +9,8 @@ export type TasksDragState = {
   dragState: "yet-started" | "dragging" | "drop-animation" | "cancel-animation";
   initialClientOffset: Offset | null;
   currentClientOffset: Offset | null;
-  toTaskListId: string | null,
-  previousTaskId: string | null
+  toTaskListId: string | null;
+  targetTaskId: string | null;
 };
 
 export const tasksDragSlice = createSlice<TasksDragState, SliceCaseReducers<TasksDragState>>({
@@ -20,7 +20,7 @@ export const tasksDragSlice = createSlice<TasksDragState, SliceCaseReducers<Task
     initialClientOffset: null,
     currentClientOffset: null,
     toTaskListId: null,
-    previousTaskId: null,
+    targetTaskId: null,
   },
   reducers: {
     dragStart: (state, action: { payload: { offset: Offset } }) => {
@@ -28,9 +28,9 @@ export const tasksDragSlice = createSlice<TasksDragState, SliceCaseReducers<Task
       state.initialClientOffset = action.payload.offset;
       state.currentClientOffset = action.payload.offset;
     },
-    updateDragState: (state, action: { payload: { toTaskListId?: string, previousTaskId?: string } }) => {
+    updateTarget: (state, action: { payload: { toTaskListId?: string; previousTaskId?: string } }) => {
       state.toTaskListId = action.payload.toTaskListId ?? null;
-      state.previousTaskId = action.payload.previousTaskId ?? null;
+      state.targetTaskId = action.payload.previousTaskId ?? null;
     },
     updateOffset: (state, action: { payload: { offset: Offset } }) => {
       state.currentClientOffset = action.payload.offset;
@@ -51,17 +51,18 @@ export const tasksDragSlice = createSlice<TasksDragState, SliceCaseReducers<Task
       state.initialClientOffset = null;
       state.currentClientOffset = null;
       state.toTaskListId = null;
-      state.previousTaskId = null;
+      state.targetTaskId = null;
     },
   },
 });
 
-export const { dragStart, updateDragState, updateOffset, dragEnd } = tasksDragSlice.actions;
+export const { dragStart, updateTarget, updateOffset, dragEnd } = tasksDragSlice.actions;
 
 export default tasksDragSlice;
 
-export const isDragTarget = (taskListId: string, previousTaskId: string | null) => (rootState: { tasksDrag: TasksDragState }) =>
-  rootState.tasksDrag.toTaskListId === taskListId && rootState.tasksDrag.previousTaskId === previousTaskId
+export const isDragTarget = (taskListId: string, previousTaskId: string | null) => (rootState: {
+  tasksDrag: TasksDragState;
+}) => rootState.tasksDrag.toTaskListId === taskListId && rootState.tasksDrag.targetTaskId === previousTaskId;
 
 export const drop = (offset: Offset, toTaskListId: string) => async (
   dispatch: Function,

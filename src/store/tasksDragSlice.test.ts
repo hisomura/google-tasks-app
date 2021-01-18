@@ -8,7 +8,7 @@ describe("tasksDragSlice", () => {
         initialClientOffset: null,
         currentClientOffset: null,
         toTaskListId: null,
-        previousTaskId: null
+        targetTaskId: null
       },
       {
         type: dragStart.type,
