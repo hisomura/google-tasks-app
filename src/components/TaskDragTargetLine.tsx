@@ -8,7 +8,7 @@ type Props = {
 };
 
 const TaskDragTargetLine: FC<Props> = (props) => {
-  const isTargeted = useSelector(isDragTarget(props.taskListId, props.previousTaskId ?? null));
+  const isTargeted = useSelector(isDragTarget(props.taskListId, props.previousTaskId));
   if (isTargeted) return <hr style={{ borderColor: "#c00" }} />;
 
   return props.previousTaskId ? <hr /> : null;

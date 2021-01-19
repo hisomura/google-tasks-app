@@ -47,12 +47,15 @@ export function signOut() {
   return gapi.auth2.getAuthInstance().signOut();
 }
 
-export async function moveTasksToAnotherTasklist(tasks: Task[], toTaskListId: string) {
-  console.log(tasks, toTaskListId);
+export async function moveTasksToAnotherTasklist(tasks: Task[], toTasklistId: string, previousTaskId?: string) {
   const batch = gapi.client.newBatch();
   tasks.forEach((task) => {
-    batch.add(gapi.client.tasks.tasks.delete({ tasklist: task.taskListId, task: task.id! }));
-    batch.add(gapi.client.tasks.tasks.insert({ tasklist: toTaskListId, resource: task }));
+    if (task.taskListId === toTasklistId) {
+      batch.add(gapi.client.tasks.tasks.move({ tasklist: task.taskListId, task: task.id!, previous: previousTaskId }));
+    } else {
+      batch.add(gapi.client.tasks.tasks.delete({ tasklist: task.taskListId, task: task.id! }));
+      batch.add(gapi.client.tasks.tasks.insert({ tasklist: toTasklistId, resource: task }));
+    }
   });
   return batch.then();
 }

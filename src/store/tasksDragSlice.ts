@@ -10,7 +10,7 @@ export type TasksDragState = {
   initialClientOffset: Offset | null;
   currentClientOffset: Offset | null;
   toTaskListId: string | null;
-  targetTaskId: string | null;
+  targetTaskId?: string;
 };
 
 export const tasksDragSlice = createSlice<TasksDragState, SliceCaseReducers<TasksDragState>>({
@@ -20,7 +20,7 @@ export const tasksDragSlice = createSlice<TasksDragState, SliceCaseReducers<Task
     initialClientOffset: null,
     currentClientOffset: null,
     toTaskListId: null,
-    targetTaskId: null,
+    targetTaskId: undefined,
   },
   reducers: {
     dragStart: (state, action: { payload: { offset: Offset } }) => {
@@ -30,7 +30,7 @@ export const tasksDragSlice = createSlice<TasksDragState, SliceCaseReducers<Task
     },
     updateTarget: (state, action: { payload: { toTaskListId?: string; previousTaskId?: string } }) => {
       state.toTaskListId = action.payload.toTaskListId ?? null;
-      state.targetTaskId = action.payload.previousTaskId ?? null;
+      state.targetTaskId = action.payload.previousTaskId;
     },
     updateOffset: (state, action: { payload: { offset: Offset } }) => {
       state.currentClientOffset = action.payload.offset;
@@ -51,16 +51,16 @@ export const tasksDragSlice = createSlice<TasksDragState, SliceCaseReducers<Task
       state.initialClientOffset = null;
       state.currentClientOffset = null;
       state.toTaskListId = null;
-      state.targetTaskId = null;
+      state.targetTaskId = undefined;
     },
   },
 });
 
-export const { dragStart, updateTarget, updateOffset, dragEnd } = tasksDragSlice.actions;
+export const { dragStart, updateTarget, updateOffset, dragEnd, initTaskDragState } = tasksDragSlice.actions;
 
 export default tasksDragSlice;
 
-export const isDragTarget = (taskListId: string, previousTaskId: string | null) => (rootState: {
+export const isDragTarget = (taskListId: string, previousTaskId?: string) => (rootState: {
   tasksDrag: TasksDragState;
 }) => rootState.tasksDrag.toTaskListId === taskListId && rootState.tasksDrag.targetTaskId === previousTaskId;
 
@@ -71,9 +71,13 @@ export const drop = (offset: Offset, toTaskListId: string) => async (
 ) => {
   dispatch(tasksDragSlice.actions.dropProcessStart({ offset, toTaskListId: toTaskListId }));
   const taskIds = Object.values(getState()["selectedTaskIds"]) as string[];
+  const toTaskListId2 = getState()["tasksDrag"].toTaskListId as string | null;
+  const previousTaskId = getState()["tasksDrag"].targetTaskId as string | undefined;
+
   const tasks = getTasksByIdsFromQueryClient(extras.queryClient, taskIds);
-  console.log(tasks);
-  await moveTasksToAnotherTasklist(tasks, toTaskListId);
+
+  console.log(tasks, toTaskListId, toTaskListId2);
+  await moveTasksToAnotherTasklist(tasks, toTaskListId, previousTaskId);
 
   const taskListIds = new Set(tasks.map((task) => task.taskListId!));
   taskListIds.add(toTaskListId);

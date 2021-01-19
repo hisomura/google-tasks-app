@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import { completeTask, Task } from "../lib/gapi-wrappers";
 import { useMutation, useQueryClient } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
-import { dragEnd, dragStart, updateOffset, updateTarget } from "../store/tasksDragSlice";
+import { dragEnd, dragStart, updateOffset, updateTarget, initTaskDragState } from "../store/tasksDragSlice";
 import CompleteButton from "./CompleteButton";
 import { addTaskIds, isSelectedSelector, removeAllTaskIds, replaceAllTaskIds } from "../store/selectedTaskIdsSlice";
 
@@ -51,6 +51,7 @@ const TaskContainer: FC<Props> = (props) => {
       onDragEnd={(e) => {
         const offset = { x: e.clientX, y: e.clientY };
         dispatch(dragEnd({ offset }));
+        dispatch(initTaskDragState({}));
       }}
       onClick={(e) => {
         e.stopPropagation();
