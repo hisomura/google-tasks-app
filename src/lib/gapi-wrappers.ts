@@ -1,5 +1,6 @@
 import GapiTask = gapi.client.tasks.Task;
 import GapiTaskList = gapi.client.tasks.TaskList;
+import { v4 as uuidV4 } from "uuid";
 
 interface Task extends GapiTask {
   taskListId: string;
@@ -47,17 +48,49 @@ export function signOut() {
   return gapi.auth2.getAuthInstance().signOut();
 }
 
-export async function moveTasksToAnotherTasklist(tasks: Task[], toTasklistId: string, previousTaskId?: string) {
+export async function moveTasks(task: Task[], toTasklistId: string, previousTaskId?: string) {
+  const tasksInAnotherTasklist = task.filter((task) => task.taskListId !== toTasklistId);
+  let newTaskIds: string[] = [];
+
+  if (tasksInAnotherTasklist.length > 0) newTaskIds = await recreateTasks(tasksInAnotherTasklist, toTasklistId);
+
+  const moveTaskIds: string[] = task
+    .filter((task) => task.taskListId === toTasklistId)
+    .map((task) => task.id!)
+    .concat(newTaskIds);
+
+  console.log("moveTaskIds", moveTaskIds);
+  if (moveTaskIds.length === 0) return;
+
   const batch = gapi.client.newBatch();
-  tasks.forEach((task) => {
-    if (task.taskListId === toTasklistId) {
-      batch.add(gapi.client.tasks.tasks.move({ tasklist: task.taskListId, task: task.id!, previous: previousTaskId }));
-    } else {
-      batch.add(gapi.client.tasks.tasks.delete({ tasklist: task.taskListId, task: task.id! }));
-      batch.add(gapi.client.tasks.tasks.insert({ tasklist: toTasklistId, resource: task }));
-    }
+  // moveTaskIds.reverse();
+  console.log(moveTaskIds);
+  let currentPreviousTaskId = previousTaskId;
+  moveTaskIds.forEach((taskId) => {
+    batch.add(gapi.client.tasks.tasks.move({ tasklist: toTasklistId, task: taskId, previous: currentPreviousTaskId }));
+    currentPreviousTaskId = taskId;
   });
+
   return batch.then();
+}
+
+async function recreateTasks(tasks: Task[], toTasklistId: string) {
+  const batch = gapi.client.newBatch();
+  const insertBatchIds: string[] = [];
+  tasks.forEach((task) => {
+    if (task.taskListId === toTasklistId) return;
+
+    const batchId = uuidV4();
+    batch.add(gapi.client.tasks.tasks.delete({ tasklist: task.taskListId, task: task.id! }));
+    batch.add(gapi.client.tasks.tasks.insert({ tasklist: toTasklistId, resource: task }), {
+      id: batchId,
+      callback() {},
+    });
+    insertBatchIds.push(batchId);
+  });
+  const batchResponse = await batch.then();
+
+  return insertBatchIds.map((id) => batchResponse.result[id].result.id) as string[];
 }
 
 export async function completeTask({ task }: { task: Task }) {

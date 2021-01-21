@@ -1,5 +1,5 @@
 import { createSlice, SliceCaseReducers } from "@reduxjs/toolkit";
-import { moveTasksToAnotherTasklist, Task } from "../lib/gapi-wrappers";
+import { moveTasks, Task } from "../lib/gapi-wrappers";
 import { QueryClient } from "react-query";
 import { removeAllTaskIds } from "./selectedTaskIdsSlice";
 
@@ -77,7 +77,7 @@ export const drop = (offset: Offset, toTaskListId: string) => async (
   const tasks = getTasksByIdsFromQueryClient(extras.queryClient, taskIds);
 
   console.log(tasks, toTaskListId, toTaskListId2);
-  await moveTasksToAnotherTasklist(tasks, toTaskListId, previousTaskId);
+  await moveTasks(tasks, toTaskListId, previousTaskId);
 
   const taskListIds = new Set(tasks.map((task) => task.taskListId!));
   taskListIds.add(toTaskListId);
