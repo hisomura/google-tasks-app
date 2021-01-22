@@ -56,8 +56,9 @@ const RectangleSelection: FC = ({ children }) => {
         setRectangleState({ ...rectangleState, currentX: e.clientX, currentY: e.clientY });
       }}
       onMouseUp={(_e) => {
+        if (!rectangleState) return;
         const taskNodeList = document.querySelectorAll<HTMLDivElement>(".task-container");
-        if (!rectangleState) throw new Error("No task nodes");
+        if (taskNodeList.length === 0) return;
         const rectangleVertexes = getRectangleVertexes(rectangleState);
         const taskIds: string[] = [];
 
