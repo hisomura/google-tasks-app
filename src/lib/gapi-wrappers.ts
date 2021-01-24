@@ -4,6 +4,7 @@ import { v4 as uuidV4 } from "uuid";
 
 interface Task extends GapiTask {
   taskListId: string;
+  id: string;
 }
 
 interface TaskList extends GapiTaskList {}
@@ -107,6 +108,8 @@ export async function completeTask({ task }: { task: Task }) {
 export async function getTasks(taskListId: string): Promise<Task[]> {
   const res = await gapi.client.tasks.tasks.list({ maxResults: 100, tasklist: taskListId });
   if (!res.result.items) return [];
+
+  // @ts-ignore
   return res.result.items.map((item) => ({ ...item, taskListId }));
 }
 

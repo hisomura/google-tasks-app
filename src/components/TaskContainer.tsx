@@ -16,7 +16,7 @@ const TaskContainer: FC<Props> = (props) => {
   const client = useQueryClient();
   const dispatch = useDispatch();
   const [completed, setCompleted] = useState(false);
-  const isSelected = useSelector(isSelectedSelector(props.task.id!));
+  const isSelected = useSelector(isSelectedSelector(props.task.id));
 
   const mutation = useMutation((props: { task: Task }) => completeTask({ task: props.task }), {
     onSuccess: () => client.invalidateQueries(["tasks", props.task.taskListId]),

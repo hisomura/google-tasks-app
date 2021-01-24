@@ -101,5 +101,5 @@ function getTasksByIdsFromQueryClient(queryClient: QueryClient, ids: string[]) {
     // TODO remove ts-ignore
     // @ts-ignore
     .reduce((acc, query) => [...acc, ...query.state.data], []) as Task[];
-  return allTasks.filter((task) => ids.includes(task.id!));
+  return allTasks.filter((task) => ids.includes(task.id));
 }
