@@ -65,8 +65,7 @@ const TaskListContainer: FC<{ tasklist: TaskList }> = (props) => {
       }}
       onDrop={(e) => {
         e.preventDefault();
-        const offset = { x: e.clientX, y: e.clientY };
-        dispatch(drop(offset, props.tasklist.id!));
+        dispatch(drop(props.tasklist.id!));
       }}
     >
       <p className="break-words pl-3 font-bold text-lg">{props.tasklist.title}</p>

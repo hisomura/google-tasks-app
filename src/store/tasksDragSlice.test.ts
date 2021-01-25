@@ -5,8 +5,6 @@ describe("tasksDragSlice", () => {
     const nextState = tasksDragSlice.reducer(
       {
         dragState: "yet-started",
-        initialClientOffset: null,
-        currentClientOffset: null,
         toTaskListId: null,
         targetTaskId: undefined
       },
@@ -16,7 +14,5 @@ describe("tasksDragSlice", () => {
       }
     );
     expect(nextState.dragState).toBe("dragging");
-    expect(nextState.initialClientOffset).toEqual({ x: 100, y: 100 });
-    expect(nextState.currentClientOffset).toEqual({ x: 100, y: 100 });
   });
 });

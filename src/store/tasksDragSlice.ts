@@ -3,12 +3,8 @@ import { moveTasks, Task } from "../lib/gapi-wrappers";
 import { QueryClient } from "react-query";
 import { removeAllTaskIds } from "./selectedTaskIdsSlice";
 
-type Offset = { x: number; y: number };
-
 export type TasksDragState = {
   dragState: "yet-started" | "dragging" | "drop-animation" | "cancel-animation";
-  initialClientOffset: Offset | null;
-  currentClientOffset: Offset | null;
   toTaskListId: string | null;
   targetTaskId?: string;
 };
@@ -17,46 +13,32 @@ export const tasksDragSlice = createSlice<TasksDragState, SliceCaseReducers<Task
   name: "tasksDrag",
   initialState: {
     dragState: "yet-started",
-    initialClientOffset: null,
-    currentClientOffset: null,
     toTaskListId: null,
     targetTaskId: undefined,
   },
   reducers: {
-    dragStart: (state, action: { payload: { offset: Offset } }) => {
+    dragStart: (state) => {
       state.dragState = "dragging";
-      state.initialClientOffset = action.payload.offset;
-      state.currentClientOffset = action.payload.offset;
     },
     updateTarget: (state, action: { payload: { toTaskListId?: string; previousTaskId?: string } }) => {
       state.toTaskListId = action.payload.toTaskListId ?? null;
       state.targetTaskId = action.payload.previousTaskId;
     },
-    updateOffset: (state, action: { payload: { offset: Offset } }) => {
-      state.currentClientOffset = action.payload.offset;
-    },
-    dropProcessStart: (state, action: { payload: { offset: Offset; toTaskListId: string } }) => {
+    dropProcessStart: (state, _action: { payload: { toTaskListId: string } }) => {
       state.dragState = "drop-animation";
-      state.currentClientOffset = action.payload.offset;
     },
-    dragEnd: (state, action: { payload: { offset: Offset } }) => {
+    dragEnd: (state, _action: {}) => {
       state.dragState = "cancel-animation";
-      state.initialClientOffset = action.payload.offset;
-      state.currentClientOffset = action.payload.offset;
-
-      // animation
     },
     initTaskDragState: (state, _action: {}) => {
       state.dragState = "yet-started";
-      state.initialClientOffset = null;
-      state.currentClientOffset = null;
       state.toTaskListId = null;
       state.targetTaskId = undefined;
     },
   },
 });
 
-export const { dragStart, updateTarget, updateOffset, dragEnd, initTaskDragState } = tasksDragSlice.actions;
+export const { dragStart, updateTarget, dragEnd, initTaskDragState } = tasksDragSlice.actions;
 
 export default tasksDragSlice;
 
@@ -64,12 +46,12 @@ export const isDragTarget = (taskListId: string, previousTaskId?: string) => (ro
   tasksDrag: TasksDragState;
 }) => rootState.tasksDrag.toTaskListId === taskListId && rootState.tasksDrag.targetTaskId === previousTaskId;
 
-export const drop = (offset: Offset, toTaskListId: string) => async (
+export const drop = (toTaskListId: string) => async (
   dispatch: Function,
   getState: Function,
   extras: { queryClient: QueryClient }
 ) => {
-  dispatch(tasksDragSlice.actions.dropProcessStart({ offset, toTaskListId: toTaskListId }));
+  dispatch(tasksDragSlice.actions.dropProcessStart({ toTaskListId: toTaskListId }));
   const taskIds = Object.values(getState()["selectedTaskIds"]) as string[];
   const toTaskListId2 = getState()["tasksDrag"].toTaskListId as string | null;
   const previousTaskId = getState()["tasksDrag"].targetTaskId as string | undefined;

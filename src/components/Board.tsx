@@ -12,7 +12,14 @@ const Board: FC = () => {
   if (isLoading) return <>"Loading..."</>;
 
   return (
-    <div onClick={() => dispatch(removeAllTaskIds({}))}>
+    <div
+      onClick={() => dispatch(removeAllTaskIds({}))}
+      onMouseMove={(e) => {
+        if (Date.now() % 10 === 0) {
+          console.log(e.clientX, e.clientY);
+        }
+      }}
+    >
       <button type="button" onClick={signOut} className="m-8 border">
         Sign out.
       </button>
