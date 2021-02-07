@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { dragEnd, dragStart, updateTarget, initTaskDragState } from "../store/tasksDragSlice";
 import CompleteButton from "./CompleteButton";
-import { addTaskIds, isSelectedSelector, removeAllTaskIds, replaceAllTaskIds } from "../store/selectedTaskIdsSlice";
+import { addTaskIds, removeTaskIds, isSelectedSelector, removeAllTaskIds, replaceAllTaskIds } from "../store/selectedTaskIdsSlice";
 
 type Props = {
   taskListId: string;
@@ -51,7 +51,11 @@ const TaskContainer: FC<Props> = (props) => {
       onClick={(e) => {
         e.stopPropagation();
         if (e.ctrlKey || e.metaKey) {
-          dispatch(addTaskIds([props.task.id]));
+          if (isSelected) {
+            dispatch(removeTaskIds([props.task.id]));
+          } else {
+            dispatch(addTaskIds([props.task.id]));
+          }
         } else {
           dispatch(replaceAllTaskIds([props.task.id]));
         }

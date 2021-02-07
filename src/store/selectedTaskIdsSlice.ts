@@ -7,9 +7,10 @@ const selectedTaskIdsSlice = createSlice<State, SliceCaseReducers<State>>({
   initialState: {},
   reducers: {
     addTaskIds: (state, action: { payload: string[] }) => {
-      action.payload.forEach((id) => {
-        state[id] = id;
-      });
+      action.payload.forEach((id) => (state[id] = id));
+    },
+    removeTaskIds: (state, action: { payload: string[] }) => {
+      action.payload.forEach((id) => delete state[id]);
     },
     removeAllTaskIds: () => ({}),
     replaceAllTaskIds: (state, action: { payload: string[] }) => {
@@ -22,13 +23,9 @@ const selectedTaskIdsSlice = createSlice<State, SliceCaseReducers<State>>({
   },
 });
 
-export const { addTaskIds, removeAllTaskIds, replaceAllTaskIds } = selectedTaskIdsSlice.actions;
+export const { addTaskIds, removeTaskIds, removeAllTaskIds, replaceAllTaskIds } = selectedTaskIdsSlice.actions;
 
 export default selectedTaskIdsSlice.reducer;
 
 export const isSelectedSelector = (id: string) => (rootState: { selectedTaskIds: State }) =>
   id in rootState.selectedTaskIds;
-
-// TODO remove
-export const selectedTaskIdsSelector = ({ selectedTaskIds }: { selectedTaskIds: State }) =>
-  Object.values(selectedTaskIds);
