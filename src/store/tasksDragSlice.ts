@@ -61,7 +61,7 @@ export const drop = (toTaskListId: string) => async (
   console.log(tasks, toTaskListId, toTaskListId2);
   await moveTasks(tasks, toTaskListId, previousTaskId);
 
-  const taskListIds = new Set(tasks.map((task) => task.taskListId!));
+  const taskListIds = new Set(tasks.map((task) => task.taskListId));
   taskListIds.add(toTaskListId);
 
   const promises = Array.from(taskListIds).map((taskListId) =>

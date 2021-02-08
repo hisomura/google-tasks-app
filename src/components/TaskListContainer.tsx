@@ -65,15 +65,15 @@ const TaskListContainer: FC<{ tasklist: TaskList }> = (props) => {
       }}
       onDrop={(e) => {
         e.preventDefault();
-        dispatch(drop(props.tasklist.id!));
+        dispatch(drop(props.tasklist.id));
       }}
     >
       <p className="break-words pl-3 font-bold text-lg select-none">{props.tasklist.title}</p>
-      <TaskDragTargetLine taskListId={props.tasklist.id!} />
+      <TaskDragTargetLine taskListId={props.tasklist.id} />
       {tasks.map((task, index) => (
         <Fragment key={task.id}>
-          <TaskContainer taskListId={props.tasklist.id!} previousTaskId={tasks[index-1]?.id} task={task} />
-          <TaskDragTargetLine taskListId={props.tasklist.id!} previousTaskId={task.id} />
+          <TaskContainer taskListId={props.tasklist.id} previousTaskId={tasks[index-1]?.id} task={task} />
+          <TaskDragTargetLine taskListId={props.tasklist.id} previousTaskId={task.id} />
         </Fragment>
       ))}
     </div>

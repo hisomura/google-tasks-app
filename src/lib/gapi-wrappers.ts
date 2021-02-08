@@ -7,7 +7,9 @@ interface Task extends GapiTask {
   id: string;
 }
 
-interface TaskList extends GapiTaskList {}
+interface TaskList extends GapiTaskList {
+  id: string;
+}
 
 const CLIENT_ID = "471921200035-m1q24a39lsd0uihb4t6i89di3an22u0k.apps.googleusercontent.com";
 const API_KEY = "AIzaSyDh6FqTnqKgzckbXVYsj1j3yEDQL6S_J6I";
@@ -97,7 +99,7 @@ async function recreateTasks(tasks: Task[], toTasklistId: string) {
 export async function completeTask({ task }: { task: Task }) {
   await gapi.client.tasks.tasks.patch({
     tasklist: task.taskListId,
-    task: task.id!,
+    task: task.id,
     resource: { status: "completed" },
   });
   return gapi.client.tasks.tasks.clear({
@@ -113,8 +115,9 @@ export async function getTasks(taskListId: string): Promise<Task[]> {
   return res.result.items.map((item) => ({ ...item, taskListId }));
 }
 
-export async function getTasklists() {
+export async function getTasklists(): Promise<TaskList[]> {
   const res = await gapi.client.tasks.tasklists.list({ maxResults: 100 });
+  // @ts-ignore
   return res.result.items;
 }
 
