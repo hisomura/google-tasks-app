@@ -68,7 +68,7 @@ const TaskListContainer: FC<{ tasklist: TaskList }> = (props) => {
         dispatch(drop(props.tasklist.id!));
       }}
     >
-      <p className="break-words pl-3 font-bold text-lg">{props.tasklist.title}</p>
+      <p className="break-words pl-3 font-bold text-lg select-none">{props.tasklist.title}</p>
       <TaskDragTargetLine taskListId={props.tasklist.id!} />
       {tasks.map((task, index) => (
         <Fragment key={task.id}>

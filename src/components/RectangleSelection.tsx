@@ -41,6 +41,7 @@ const RectangleSelection: FC = ({ children }) => {
   const dispatch = useDispatch();
   return (
     <div
+      draggable={false}
       style={parentStyle}
       onMouseDown={(e) => {
         if (e.button !== 0) return;

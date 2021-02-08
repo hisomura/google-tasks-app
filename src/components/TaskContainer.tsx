@@ -29,6 +29,7 @@ const TaskContainer: FC<Props> = (props) => {
       style={isSelected ? { backgroundColor: "#ccc" } : {}}
       draggable={true}
       onDragStart={(_e) => {
+        _e.stopPropagation();
         if (!isSelected) dispatch(replaceAllTaskIds([props.task.id]));
 
         dispatch(dragStart({}));
