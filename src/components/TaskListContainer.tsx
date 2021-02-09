@@ -1,6 +1,6 @@
 import { FC, Fragment } from "react";
-import { useQuery } from "react-query";
-import { getTasks, Task, TaskList } from "../lib/gapi-wrappers";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { createTask, getTasks, Task, TaskList } from "../lib/gapi-wrappers";
 import TaskContainer from "./TaskContainer";
 import { useDispatch } from "react-redux";
 import { drop } from "../store/tasksDragSlice";
@@ -34,11 +34,16 @@ function separateAndSortTasks(input: Task[]) {
 }
 
 const TaskListContainer: FC<{ tasklist: TaskList }> = (props) => {
+  const client = useQueryClient();
   const dispatch = useDispatch();
   const { isLoading, data } = useQuery(["tasks", props.tasklist.id], async () => {
     if (props.tasklist.id === undefined) return undefined;
     const tasks = await getTasks(props.tasklist.id);
     return tasks ?? [];
+  });
+
+  const mutation = useMutation((title: string) => createTask(title, props.tasklist.id), {
+    onSuccess: () => client.invalidateQueries(["tasks", props.tasklist.id]),
   });
 
   if (isLoading) {
@@ -69,10 +74,26 @@ const TaskListContainer: FC<{ tasklist: TaskList }> = (props) => {
       }}
     >
       <p className="break-words pl-3 font-bold text-lg select-none">{props.tasklist.title}</p>
+      <div className="flex items-center p-3">
+        <span className="flex-initial mr-3">+</span>
+        <input
+          className="flex-initial break-all focus:outline-none"
+          onKeyDown={(event) => {
+            // https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode
+            // if (event.keyCode === 229) return
+            if (event.key !== "Enter") return;
+            if (event.currentTarget.value === "") return;
+            mutation.mutate(event.currentTarget.value);
+            event.currentTarget.value = "";
+          }}
+          type="text"
+        />
+      </div>
+
       <TaskDragTargetLine taskListId={props.tasklist.id} />
       {tasks.map((task, index) => (
         <Fragment key={task.id}>
-          <TaskContainer taskListId={props.tasklist.id} previousTaskId={tasks[index-1]?.id} task={task} />
+          <TaskContainer taskListId={props.tasklist.id} previousTaskId={tasks[index - 1]?.id} task={task} />
           <TaskDragTargetLine taskListId={props.tasklist.id} previousTaskId={task.id} />
         </Fragment>
       ))}

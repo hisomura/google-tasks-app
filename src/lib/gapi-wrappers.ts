@@ -96,6 +96,10 @@ async function recreateTasks(tasks: Task[], toTasklistId: string) {
   return insertBatchIds.map((id) => batchResponse.result[id].result.id) as string[];
 }
 
+export async function createTask(title: string, toTasklistId: string) {
+  return gapi.client.tasks.tasks.insert({ tasklist: toTasklistId, resource: { title } });
+}
+
 export async function completeTask({ task }: { task: Task }) {
   await gapi.client.tasks.tasks.patch({
     tasklist: task.taskListId,
