@@ -4,7 +4,13 @@ import { useMutation, useQueryClient } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { dragEnd, dragStart, updateTarget, initTaskDragState } from "../store/tasksDragSlice";
 import CompleteButton from "./CompleteButton";
-import { addTaskIds, removeTaskIds, isSelectedSelector, removeAllTaskIds, replaceAllTaskIds } from "../store/selectedTaskIdsSlice";
+import {
+  addTaskIds,
+  removeTaskIds,
+  isSelectedSelector,
+  removeAllTaskIds,
+  replaceAllTaskIds,
+} from "../store/selectedTaskIdsSlice";
 
 type Props = {
   taskListId: string;
@@ -64,7 +70,7 @@ const TaskContainer: FC<Props> = (props) => {
       onMouseDown={(e) => e.stopPropagation()}
     >
       <div className="flex items-center p-3">
-        <div className="flex-initial mr-3">
+        <div className={"flex-initial mr-3" + (props.task.parent ? " ml-3" : "")}>
           <CompleteButton
             onClick={(e) => {
               e.stopPropagation();

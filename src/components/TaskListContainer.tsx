@@ -1,37 +1,11 @@
 import { FC, Fragment } from "react";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { createTask, getTasks, Task, TaskList } from "../lib/gapi-wrappers";
+import { createTask, getTasks, TaskList } from "../lib/gapi-wrappers";
 import TaskContainer from "./TaskContainer";
 import { useDispatch } from "react-redux";
 import { drop } from "../store/tasksDragSlice";
 import TaskDragTargetLine from "./TaskDragTargetLine";
-
-const taskSortFunc = (a: Task, b: Task) => parseInt(a.position!) - parseInt(b.position!);
-
-function separateAndSortTasks(input: Task[]) {
-  const tasks: Task[] = [];
-  const subTasksTable = new Map<string, Task[]>();
-
-  input.forEach((t) => {
-    if (!t.parent) {
-      tasks.push(t);
-    } else {
-      const tasks = subTasksTable.get(t.parent);
-      if (tasks) {
-        tasks.push(t);
-      } else {
-        subTasksTable.set(t.parent, [t]);
-      }
-    }
-  });
-
-  tasks.sort(taskSortFunc);
-  for (const subTasks of subTasksTable.values()) {
-    subTasks.sort(taskSortFunc);
-  }
-
-  return [tasks, subTasksTable] as const;
-}
+import { sortTasks } from "../lib/tasks";
 
 const TaskListContainer: FC<{ tasklist: TaskList }> = (props) => {
   const client = useQueryClient();
@@ -60,7 +34,7 @@ const TaskListContainer: FC<{ tasklist: TaskList }> = (props) => {
     return <div>Something wrong</div>;
   }
 
-  const [tasks] = separateAndSortTasks(data);
+  const tasks = sortTasks(data);
 
   return (
     <div
