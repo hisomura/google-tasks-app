@@ -1,11 +1,11 @@
 import { FC, Fragment } from "react";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { createTask, getTasks, TaskList } from "../lib/gapi-wrappers";
-import TaskContainer from "./TaskContainer";
 import { useDispatch } from "react-redux";
-import { drop } from "../store/tasksDragSlice";
-import TaskDragTargetLine from "./TaskDragTargetLine";
+import { createTask, getTasks, TaskList } from "../lib/gapi-wrappers";
 import { sortTasks } from "../lib/tasks";
+import { drop } from "../store/tasksDragSlice";
+import TaskContainer from "./TaskContainer";
+import TaskDragTargetLine from "./TaskDragTargetLine";
 
 const TaskListContainer: FC<{ tasklist: TaskList }> = (props) => {
   const client = useQueryClient();

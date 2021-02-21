@@ -1,6 +1,6 @@
 import { createSlice, SliceCaseReducers } from "@reduxjs/toolkit";
-import { moveTasks, Task } from "../lib/gapi-wrappers";
 import { QueryClient } from "react-query";
+import { moveTasks, Task } from "../lib/gapi-wrappers";
 import { removeAllTaskIds } from "./selectedTaskIdsSlice";
 
 export type TasksDragState = {
@@ -49,30 +49,48 @@ export const isDragTarget = (taskListId: string, previousTaskId?: string) => (ro
 export const drop = (toTaskListId: string) => async (
   dispatch: Function,
   getState: Function,
-  extras: { queryClient: QueryClient }
+  { queryClient }: { queryClient: QueryClient }
 ) => {
   dispatch(tasksDragSlice.actions.dropProcessStart({ toTaskListId: toTaskListId }));
   const taskIds = Object.values(getState()["selectedTaskIds"]) as string[];
-  const toTaskListId2 = getState()["tasksDrag"].toTaskListId as string | null;
   const previousTaskId = getState()["tasksDrag"].targetTaskId as string | undefined;
 
-  const tasks = getTasksByIdsFromQueryClient(extras.queryClient, taskIds);
+  const tasks = getTasksByIdsFromQueryClient(queryClient, taskIds);
 
-  console.log(tasks, toTaskListId, toTaskListId2);
+  optimisticUpdates(queryClient, tasks, { taskListId: toTaskListId, prevTaskId: previousTaskId });
   await moveTasks(tasks, toTaskListId, previousTaskId);
 
   const taskListIds = new Set(tasks.map((task) => task.taskListId));
   taskListIds.add(toTaskListId);
 
-  const promises = Array.from(taskListIds).map((taskListId) =>
-    extras.queryClient.invalidateQueries(["tasks", taskListId])
-  );
+  const promises = Array.from(taskListIds).map((taskListId) => queryClient.invalidateQueries(["tasks", taskListId]));
   await Promise.all(promises);
 
   // animation
   dispatch(tasksDragSlice.actions.initTaskDragState({}));
   dispatch(removeAllTaskIds({}));
 };
+
+type DragDestination = {
+  taskListId: string;
+  prevTaskId: string | undefined;
+};
+
+function optimisticUpdates(queryClient: QueryClient, tasks: Task[], { taskListId, prevTaskId }: DragDestination) {
+  queryClient.setQueryData<Task[]>(["tasks", taskListId], (oldData) => {
+    if (oldData === undefined) oldData = [];
+    const prevTask = oldData.find((task) => task.id === prevTaskId);
+    const positionBase = prevTask?.position ?? "";
+    const tmpTasks = tasks.map((task, index) => ({
+      ...task,
+      id: `old-id-${task.id}`,
+      taskListId: taskListId,
+      position: positionBase + index.toString(),
+    }));
+
+    return [...oldData, ...tmpTasks];
+  });
+}
 
 function getTasksByIdsFromQueryClient(queryClient: QueryClient, ids: string[]) {
   // TODO remove ts-ignore
