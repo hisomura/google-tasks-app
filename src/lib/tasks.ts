@@ -1,6 +1,14 @@
 import { Task } from "./gapi-wrappers";
 
-const taskSortFunc = (a: Task, b: Task) => parseInt(a.position!) - parseInt(b.position!);
+const taskSortFunc = (a: Task, b: Task) => {
+  if (a.position! > b.position!) {
+    return 1;
+  } else if (a.position! < b.position!) {
+    return -1;
+  } else {
+    return 0;
+  }
+};
 
 export function sortTasks(input: Task[]): Task[] {
   const tasks: Task[] = [];
