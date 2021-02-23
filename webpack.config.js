@@ -1,28 +1,32 @@
-import { Configuration } from "webpack";
-// const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-import MiniCssExtractPlugin from "mini-css-extract-plugin";
-
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-// import HtmlWebpackPlugin from "html-webpack-plugin";
 
 const path = require("path");
 
-const prodMode = process.env.NODE_ENV === "production";
+const isEnvProduction = process.env.NODE_ENV === "production";
 
-const config: Configuration = {
-  mode: prodMode ? "production" : "development",
+module.exports = {
+  mode: isEnvProduction ? "production" : "development",
+  bail: isEnvProduction,
+  devtool: isEnvProduction ? undefined : "source-map",
+
   entry: "./src/index.tsx",
   output: {
     path: path.resolve(__dirname, "dist"),
     publicPath: "/",
-    filename: prodMode ? "[name].[fullhash].js" : "[name].js",
+    filename: isEnvProduction ? "[name].[chunkhash].js" : "[name].js",
+  },
+
+  optimization: {
+    splitChunks: {
+      chunks: "all",
+      name: false,
+    },
   },
 
   resolve: {
     extensions: [".js", ".json", ".ts", ".tsx"],
   },
-
-  devtool: prodMode ? undefined : "source-map",
 
   devServer: {
     open: true,
@@ -37,7 +41,7 @@ const config: Configuration = {
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // both options are optional
-      filename: prodMode ? "[name].[fullhash].css" : "[name].css",
+      filename: isEnvProduction ? "[name].[fullhash].css" : "[name].css",
     }),
   ],
 
@@ -48,7 +52,7 @@ const config: Configuration = {
         use: {
           loader: "ts-loader",
           options: {
-            configFile: prodMode ? "tsconfig.prod.json" : "tsconfig.json",
+            configFile: isEnvProduction ? "tsconfig.prod.json" : "tsconfig.json",
           },
         },
         include: path.resolve(__dirname, "src"),
@@ -73,5 +77,3 @@ const config: Configuration = {
     ],
   },
 };
-
-export default config;
