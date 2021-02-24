@@ -125,4 +125,4 @@ export async function getTasklists(): Promise<TaskList[]> {
   return res.result.items;
 }
 
-export { Task, TaskList };
+export type { Task, TaskList };
