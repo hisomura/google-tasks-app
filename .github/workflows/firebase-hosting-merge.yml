@@ -15,7 +15,11 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '14'
-      - run: npm ci && npm run build
+      - run: npm ci
+        env:
+          NODE_ENV: development # FIXME development -> production
+      - run : ls -al ./node_modules
+      - run: npm run build
         env:
           NODE_ENV: production
       - uses: FirebaseExtended/action-hosting-deploy@v0
