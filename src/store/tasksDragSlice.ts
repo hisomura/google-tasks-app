@@ -2,6 +2,7 @@ import { createSlice, SliceCaseReducers } from "@reduxjs/toolkit";
 import { QueryClient } from "react-query";
 import { moveTasks, Task } from "../lib/gapi-wrappers";
 import { removeAllTaskIds } from "./selectedTaskIdsSlice";
+import { RootState } from "./store";
 
 export type TasksDragState = {
   dragState: "yet-started" | "dragging" | "drop-animation" | "cancel-animation";
@@ -42,9 +43,8 @@ export const { dragStart, updateTarget, dragEnd, initTaskDragState } = tasksDrag
 
 export default tasksDragSlice;
 
-export const isDragTarget = (taskListId: string, previousTaskId?: string) => (rootState: {
-  tasksDrag: TasksDragState;
-}) => rootState.tasksDrag.toTaskListId === taskListId && rootState.tasksDrag.targetTaskId === previousTaskId;
+export const isDragTarget = (taskListId: string, previousTaskId?: string) => (rootState: RootState) =>
+  rootState.tasksDrag.toTaskListId === taskListId && rootState.tasksDrag.targetTaskId === previousTaskId;
 
 export const drop = (toTaskListId: string) => async (
   dispatch: Function,

@@ -1,4 +1,5 @@
 import { createSlice, SliceCaseReducers } from "@reduxjs/toolkit";
+import { RootState } from "./store";
 
 type State = { [key: string]: string };
 
@@ -27,5 +28,4 @@ export const { addTaskIds, removeTaskIds, removeAllTaskIds, replaceAllTaskIds } 
 
 export default selectedTaskIdsSlice.reducer;
 
-export const isSelectedSelector = (id: string) => (rootState: { selectedTaskIds: State }) =>
-  id in rootState.selectedTaskIds;
+export const isSelectedSelector = (id: string) => (rootState: RootState) => id in rootState.selectedTaskIds;
