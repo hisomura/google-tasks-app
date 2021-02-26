@@ -1,6 +1,7 @@
 import { createSlice, SliceCaseReducers } from "@reduxjs/toolkit";
 import { QueryClient } from "react-query";
 import { moveTasks, Task } from "../lib/gapi-wrappers";
+import { optimisticUpdatesForMoveTasks } from "../lib/react-query-helper";
 import { removeAllTaskIds } from "./selectedTaskIdsSlice";
 import { RootState } from "./store";
 
@@ -57,7 +58,7 @@ export const drop = (toTaskListId: string) => async (
 
   const tasks = getTasksByIdsFromQueryClient(queryClient, taskIds);
 
-  optimisticUpdates(queryClient, tasks, { taskListId: toTaskListId, prevTaskId: previousTaskId });
+  optimisticUpdatesForMoveTasks(queryClient, tasks, { taskListId: toTaskListId, prevTaskId: previousTaskId });
   await moveTasks(tasks, toTaskListId, previousTaskId);
 
   const taskListIds = new Set(tasks.map((task) => task.taskListId));
@@ -71,34 +72,12 @@ export const drop = (toTaskListId: string) => async (
   dispatch(removeAllTaskIds({}));
 };
 
-type DragDestination = {
-  taskListId: string;
-  prevTaskId: string | undefined;
-};
-
-function optimisticUpdates(queryClient: QueryClient, tasks: Task[], { taskListId, prevTaskId }: DragDestination) {
-  queryClient.setQueryData<Task[]>(["tasks", taskListId], (oldData) => {
-    if (oldData === undefined) oldData = [];
-    const prevTask = oldData.find((task) => task.id === prevTaskId);
-    const positionBase = prevTask?.position ?? "";
-    const tmpTasks = tasks.map((task, index) => ({
-      ...task,
-      id: `old-id-${task.id}`,
-      taskListId: taskListId,
-      position: positionBase + index.toString(),
-    }));
-
-    return [...oldData, ...tmpTasks];
-  });
-}
-
 function getTasksByIdsFromQueryClient(queryClient: QueryClient, ids: string[]) {
-  // TODO remove ts-ignore
+  queryClient.getQueryCache().findAll("tasks");
   // @ts-ignore
   const allTasks = queryClient
     .getQueryCache()
     .findAll("tasks")
-    // TODO remove ts-ignore
     // @ts-ignore
     .reduce((acc, query) => [...acc, ...query.state.data], []) as Task[];
   return allTasks.filter((task) => ids.includes(task.id));
