@@ -7,7 +7,7 @@ import { RootState } from "./store";
 
 export type TasksDragState = {
   dragState: "yet-started" | "dragging" | "drop-animation" | "cancel-animation";
-  toTaskListId: string | null;
+  toTasklistId: string | null;
   targetTaskId?: string;
 };
 
@@ -15,18 +15,18 @@ export const tasksDragSlice = createSlice<TasksDragState, SliceCaseReducers<Task
   name: "tasksDrag",
   initialState: {
     dragState: "yet-started",
-    toTaskListId: null,
+    toTasklistId: null,
     targetTaskId: undefined,
   },
   reducers: {
     dragStart: (state) => {
       state.dragState = "dragging";
     },
-    updateTarget: (state, action: { payload: { toTaskListId?: string; previousTaskId?: string } }) => {
-      state.toTaskListId = action.payload.toTaskListId ?? null;
+    updateTarget: (state, action: { payload: { toTasklistId?: string; previousTaskId?: string } }) => {
+      state.toTasklistId = action.payload.toTasklistId ?? null;
       state.targetTaskId = action.payload.previousTaskId;
     },
-    dropProcessStart: (state, _action: { payload: { toTaskListId: string } }) => {
+    dropProcessStart: (state, _action: { payload: { toTasklistId: string } }) => {
       state.dragState = "drop-animation";
     },
     dragEnd: (state, _action: {}) => {
@@ -34,7 +34,7 @@ export const tasksDragSlice = createSlice<TasksDragState, SliceCaseReducers<Task
     },
     initTaskDragState: (state, _action: {}) => {
       state.dragState = "yet-started";
-      state.toTaskListId = null;
+      state.toTasklistId = null;
       state.targetTaskId = undefined;
     },
   },
@@ -44,27 +44,27 @@ export const { dragStart, updateTarget, dragEnd, initTaskDragState } = tasksDrag
 
 export default tasksDragSlice;
 
-export const isDragTarget = (taskListId: string, previousTaskId?: string) => (rootState: RootState) =>
-  rootState.tasksDrag.toTaskListId === taskListId && rootState.tasksDrag.targetTaskId === previousTaskId;
+export const isDragTarget = (tasklistId: string, previousTaskId?: string) => (rootState: RootState) =>
+  rootState.tasksDrag.toTasklistId === tasklistId && rootState.tasksDrag.targetTaskId === previousTaskId;
 
-export const drop = (toTaskListId: string) => async (
+export const drop = (toTasklistId: string) => async (
   dispatch: Function,
   getState: Function,
   { queryClient }: { queryClient: QueryClient }
 ) => {
-  dispatch(tasksDragSlice.actions.dropProcessStart({ toTaskListId: toTaskListId }));
+  dispatch(tasksDragSlice.actions.dropProcessStart({ toTasklistId: toTasklistId }));
   const taskIds = Object.values(getState()["selectedTaskIds"]) as string[];
   const previousTaskId = getState()["tasksDrag"].targetTaskId as string | undefined;
 
   const tasks = getTasksByIdsFromQueryClient(queryClient, taskIds);
 
-  optimisticUpdatesForMoveTasks(queryClient, tasks, { taskListId: toTaskListId, prevTaskId: previousTaskId });
-  await moveTasks(tasks, toTaskListId, previousTaskId);
+  optimisticUpdatesForMoveTasks(queryClient, tasks, { tasklistId: toTasklistId, prevTaskId: previousTaskId });
+  await moveTasks(tasks, toTasklistId, previousTaskId);
 
-  const taskListIds = new Set(tasks.map((task) => task.taskListId));
-  taskListIds.add(toTaskListId);
+  const tasklistIds = new Set(tasks.map((task) => task.tasklistId));
+  tasklistIds.add(toTasklistId);
 
-  const promises = Array.from(taskListIds).map((taskListId) => queryClient.invalidateQueries(["tasks", taskListId]));
+  const promises = Array.from(tasklistIds).map((tasklistId) => queryClient.invalidateQueries(["tasks", tasklistId]));
   await Promise.all(promises);
 
   // animation

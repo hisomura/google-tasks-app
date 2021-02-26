@@ -1,13 +1,13 @@
 import { FC, Fragment } from "react";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useDispatch } from "react-redux";
-import { createTask, getTasks, TaskList } from "../lib/gapi-wrappers";
+import { createTask, getTasks, Tasklist } from "../lib/gapi-wrappers";
 import { sortTasks } from "../lib/tasks";
 import { drop } from "../store/tasksDragSlice";
 import TaskContainer from "./TaskContainer";
 import TaskDragTargetLine from "./TaskDragTargetLine";
 
-const TaskListContainer: FC<{ tasklist: TaskList }> = (props) => {
+const TasklistContainer: FC<{ tasklist: Tasklist }> = (props) => {
   const client = useQueryClient();
   const dispatch = useDispatch();
   const { isLoading, data } = useQuery(["tasks", props.tasklist.id], async () => {
@@ -64,15 +64,15 @@ const TaskListContainer: FC<{ tasklist: TaskList }> = (props) => {
         />
       </div>
 
-      <TaskDragTargetLine taskListId={props.tasklist.id} />
+      <TaskDragTargetLine tasklistId={props.tasklist.id} />
       {tasks.map((task, index) => (
         <Fragment key={task.id}>
-          <TaskContainer taskListId={props.tasklist.id} previousTaskId={tasks[index - 1]?.id} task={task} />
-          <TaskDragTargetLine taskListId={props.tasklist.id} previousTaskId={task.id} />
+          <TaskContainer tasklistId={props.tasklist.id} previousTaskId={tasks[index - 1]?.id} task={task} />
+          <TaskDragTargetLine tasklistId={props.tasklist.id} previousTaskId={task.id} />
         </Fragment>
       ))}
     </div>
   );
 };
 
-export default TaskListContainer;
+export default TasklistContainer;

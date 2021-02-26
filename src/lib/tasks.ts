@@ -41,8 +41,8 @@ export function sortTasks(input: Task[]): Task[] {
 export function createTasksMap(tasks: Task[]) {
   const tasksMap = new Map<string, Task[]>();
   tasks.forEach((task) => {
-    const currentTasks = tasksMap.get(task.taskListId) ?? [];
-    tasksMap.set(task.taskListId, [...currentTasks, task]);
+    const currentTasks = tasksMap.get(task.tasklistId) ?? [];
+    tasksMap.set(task.tasklistId, [...currentTasks, task]);
   });
 
   return tasksMap;

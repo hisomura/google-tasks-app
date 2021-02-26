@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { useQuery } from "react-query";
-import TaskListContainer from "./TaskListContainer";
+import TasklistContainer from "./TasklistContainer";
 import { getTasklists, signOut } from "../lib/gapi-wrappers";
 import { removeAllTaskIds } from "../store/selectedTaskIdsSlice";
 import { useDispatch } from "react-redux";
@@ -17,9 +17,9 @@ const Board: FC = () => {
         Sign out.
       </button>
       <div className="flex flex-wrap">
-        {data?.map((taskList) => (
-          <div key={taskList.id} className="">
-            <TaskListContainer tasklist={taskList} />
+        {data?.map((tasklist) => (
+          <div key={tasklist.id} className="">
+            <TasklistContainer tasklist={tasklist} />
           </div>
         ))}
       </div>

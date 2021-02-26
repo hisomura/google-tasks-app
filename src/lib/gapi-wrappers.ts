@@ -3,11 +3,11 @@ import GapiTaskList = gapi.client.tasks.TaskList;
 import { v4 as uuidV4 } from "uuid";
 
 interface Task extends GapiTask {
-  taskListId: string;
+  tasklistId: string;
   id: string;
 }
 
-interface TaskList extends GapiTaskList {
+interface Tasklist extends GapiTaskList {
   id: string;
 }
 
@@ -52,13 +52,13 @@ export function signOut() {
 }
 
 export async function moveTasks(task: Task[], toTasklistId: string, previousTaskId?: string) {
-  const tasksInAnotherTasklist = task.filter((task) => task.taskListId !== toTasklistId);
+  const tasksInAnotherTasklist = task.filter((task) => task.tasklistId !== toTasklistId);
   let newTaskIds: string[] = [];
 
   if (tasksInAnotherTasklist.length > 0) newTaskIds = await recreateTasks(tasksInAnotherTasklist, toTasklistId);
 
   const moveTaskIds: string[] = task
-    .filter((task) => task.taskListId === toTasklistId)
+    .filter((task) => task.tasklistId === toTasklistId)
     .map((task) => task.id!)
     .concat(newTaskIds);
 
@@ -81,10 +81,10 @@ async function recreateTasks(tasks: Task[], toTasklistId: string) {
   const batch = gapi.client.newBatch();
   const insertBatchIds: string[] = [];
   tasks.forEach((task) => {
-    if (task.taskListId === toTasklistId) return;
+    if (task.tasklistId === toTasklistId) return;
 
     const batchId = uuidV4();
-    batch.add(gapi.client.tasks.tasks.delete({ tasklist: task.taskListId, task: task.id! }));
+    batch.add(gapi.client.tasks.tasks.delete({ tasklist: task.tasklistId, task: task.id! }));
     batch.add(gapi.client.tasks.tasks.insert({ tasklist: toTasklistId, resource: task }), {
       id: batchId,
       callback() {},
@@ -102,27 +102,28 @@ export async function createTask(title: string, toTasklistId: string) {
 
 export async function completeTask({ task }: { task: Task }) {
   await gapi.client.tasks.tasks.patch({
-    tasklist: task.taskListId,
+    tasklist: task.tasklistId,
     task: task.id,
     resource: { status: "completed" },
   });
   return gapi.client.tasks.tasks.clear({
-    tasklist: task.taskListId,
+    tasklist: task.tasklistId,
   });
 }
 
-export async function getTasks(taskListId: string): Promise<Task[]> {
-  const res = await gapi.client.tasks.tasks.list({ maxResults: 100, tasklist: taskListId });
+export async function getTasks(tasklistId: string): Promise<Task[]> {
+  const res = await gapi.client.tasks.tasks.list({ maxResults: 100, tasklist: tasklistId });
   if (!res.result.items) return [];
 
   // @ts-ignore
-  return res.result.items.map((item) => ({ ...item, taskListId }));
+  return res.result.items.map((item) => ({ ...item, tasklistId: tasklistId }));
 }
 
-export async function getTasklists(): Promise<TaskList[]> {
+export async function getTasklists(): Promise<Tasklist[]> {
   const res = await gapi.client.tasks.tasklists.list({ maxResults: 100 });
+
   // @ts-ignore
   return res.result.items;
 }
 
-export type { Task, TaskList };
+export type { Task, Tasklist };

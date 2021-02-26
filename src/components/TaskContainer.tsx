@@ -13,7 +13,7 @@ import {
 } from "../store/selectedTaskIdsSlice";
 
 type Props = {
-  taskListId: string;
+  tasklistId: string;
   previousTaskId?: string;
   task: Task;
 };
@@ -25,7 +25,7 @@ const TaskContainer: FC<Props> = (props) => {
   const isSelected = useSelector(isSelectedSelector(props.task.id));
 
   const mutation = useMutation((props: { task: Task }) => completeTask({ task: props.task }), {
-    onSuccess: () => client.invalidateQueries(["tasks", props.task.taskListId]),
+    onSuccess: () => client.invalidateQueries(["tasks", props.task.tasklistId]),
   });
 
   return (
@@ -46,7 +46,7 @@ const TaskContainer: FC<Props> = (props) => {
         const previousTaskFocused = rect.top + rect.height / 2 > e.clientY;
         dispatch(
           updateTarget({
-            toTaskListId: props.taskListId,
+            toTasklistId: props.tasklistId,
             previousTaskId: previousTaskFocused ? props.previousTaskId : props.task.id,
           })
         );
