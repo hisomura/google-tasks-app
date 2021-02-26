@@ -8,8 +8,8 @@ const GapiAuthProvider: FC = (props) => {
   const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => {
-    async function init () {
-      await initGapiClient()
+    async function init() {
+      await initGapiClient();
       listenIsSignedIn(setSignedIn);
       setGapiReady(true);
       setSignedIn(isSignedIn());

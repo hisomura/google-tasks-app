@@ -5,7 +5,7 @@ import { replaceAllTaskIds } from "../store/selectedTaskIdsSlice";
 const parentStyle: React.CSSProperties = {
   position: "relative",
   width: "100vw",
-  height: "100vh"
+  height: "100vh",
 };
 
 function getRectangleStyle(state: RectangleState): React.CSSProperties {
@@ -19,7 +19,7 @@ function getRectangleStyle(state: RectangleState): React.CSSProperties {
     width: Math.abs(state.currentX - state.startX),
     height: Math.abs(state.currentY - state.startY),
     backgroundColor: "#85bdf8",
-    opacity: "0.5"
+    opacity: "0.5",
   };
 }
 
@@ -49,7 +49,7 @@ const RectangleSelection: FC = ({ children }) => {
           startX: e.clientX,
           startY: e.clientY,
           currentX: e.clientX,
-          currentY: e.clientY
+          currentY: e.clientY,
         });
       }}
       onMouseMove={(e) => {
