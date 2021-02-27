@@ -7,24 +7,30 @@ import { RootState } from "./store";
 
 export type TasksDragState = {
   dragState: "yet-started" | "dragging" | "drop-animation" | "cancel-animation";
+  toSubtask: boolean;
   toTasklistId: string | null;
-  targetTaskId?: string;
+  targetTaskId: string | null;
 };
 
 export const tasksDragSlice = createSlice<TasksDragState, SliceCaseReducers<TasksDragState>>({
   name: "tasksDrag",
   initialState: {
     dragState: "yet-started",
+    toSubtask: false,
     toTasklistId: null,
-    targetTaskId: undefined,
+    targetTaskId: null,
   },
   reducers: {
     dragStart: (state) => {
       state.dragState = "dragging";
     },
-    updateTarget: (state, action: { payload: { toTasklistId?: string; previousTaskId?: string } }) => {
+    updateTarget: (
+      state,
+      action: { payload: { toTasklistId?: string; previousTaskId?: string; toSubtask: boolean } }
+    ) => {
       state.toTasklistId = action.payload.toTasklistId ?? null;
-      state.targetTaskId = action.payload.previousTaskId;
+      state.targetTaskId = action.payload.previousTaskId ?? null;
+      state.toSubtask = action.payload.toSubtask;
     },
     dropProcessStart: (state, _action: { payload: { toTasklistId: string } }) => {
       state.dragState = "drop-animation";
@@ -35,7 +41,7 @@ export const tasksDragSlice = createSlice<TasksDragState, SliceCaseReducers<Task
     initTaskDragState: (state, _action: {}) => {
       state.dragState = "yet-started";
       state.toTasklistId = null;
-      state.targetTaskId = undefined;
+      state.targetTaskId = null;
     },
   },
 });
@@ -55,11 +61,12 @@ export const drop = (toTasklistId: string) => async (
   dispatch(tasksDragSlice.actions.dropProcessStart({ toTasklistId: toTasklistId }));
   const taskIds = Object.values(getState()["selectedTaskIds"]) as string[];
   const previousTaskId = getState()["tasksDrag"].targetTaskId as string | undefined;
+  const toSubtask = getState()["tasksDrag"].toSubtask as boolean;
 
   const tasks = getTasksByIdsFromQueryClient(queryClient, taskIds);
 
   optimisticUpdatesForMoveTasks(queryClient, tasks, { tasklistId: toTasklistId, prevTaskId: previousTaskId });
-  await moveTasks(tasks, toTasklistId, previousTaskId);
+  await moveTasks(tasks, toSubtask, toTasklistId, previousTaskId);
 
   const tasklistIds = new Set(tasks.map((task) => task.tasklistId));
   tasklistIds.add(toTasklistId);

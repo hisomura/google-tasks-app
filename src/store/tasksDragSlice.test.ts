@@ -5,8 +5,9 @@ describe("tasksDragSlice", () => {
     const nextState = tasksDragSlice.reducer(
       {
         dragState: "yet-started",
+        toSubtask: false,
         toTasklistId: null,
-        targetTaskId: undefined,
+        targetTaskId: null,
       },
       {
         type: dragStart.type,

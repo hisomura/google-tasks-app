@@ -51,13 +51,13 @@ export function signOut() {
   return gapi.auth2.getAuthInstance().signOut();
 }
 
-export async function moveTasks(task: Task[], toTasklistId: string, previousTaskId?: string) {
-  const tasksInAnotherTasklist = task.filter((task) => task.tasklistId !== toTasklistId);
+export async function moveTasks(tasks: Task[], toSubtask: boolean, toTasklistId: string, previousTaskId?: string) {
+  const tasksInAnotherTasklist = tasks.filter((task) => task.tasklistId !== toTasklistId);
   let newTaskIds: string[] = [];
 
   if (tasksInAnotherTasklist.length > 0) newTaskIds = await recreateTasks(tasksInAnotherTasklist, toTasklistId);
 
-  const moveTaskIds: string[] = task
+  const moveTaskIds: string[] = tasks
     .filter((task) => task.tasklistId === toTasklistId)
     .map((task) => task.id!)
     .concat(newTaskIds);
@@ -66,13 +66,32 @@ export async function moveTasks(task: Task[], toTasklistId: string, previousTask
   if (moveTaskIds.length === 0) return;
 
   const batch = gapi.client.newBatch();
-  // moveTaskIds.reverse();
-  console.log(moveTaskIds);
-  let currentPreviousTaskId = previousTaskId;
   moveTaskIds.forEach((taskId) => {
-    batch.add(gapi.client.tasks.tasks.move({ tasklist: toTasklistId, task: taskId, previous: currentPreviousTaskId }));
-    currentPreviousTaskId = taskId;
+    // Is it easy to read ?
+    const request = {
+      tasklist: toTasklistId,
+      task: taskId,
+      ...(toSubtask ? { parent: previousTaskId } : { previous: previousTaskId }),
+    };
+    console.log("request", request);
+    batch.add(gapi.client.tasks.tasks.move(request));
   });
+
+  // if (toSubtask) {
+  //   moveTaskIds.forEach((taskId) =>
+  //     batch.add(gapi.client.tasks.tasks.move({ tasklist: toTasklistId, task: taskId, parent: previousTaskId }))
+  //   );
+  // } else {
+  //   moveTaskIds.forEach((taskId) =>
+  //     batch.add(
+  //       gapi.client.tasks.tasks.move({
+  //         tasklist: toTasklistId,
+  //         task: taskId,
+  //         previous: previousTaskId,
+  //       })
+  //     )
+  //   );
+  // }
 
   return batch.then();
 }

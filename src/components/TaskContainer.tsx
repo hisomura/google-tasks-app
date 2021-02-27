@@ -44,10 +44,18 @@ const TaskContainer: FC<Props> = (props) => {
         // e.preventDefault();
         const rect = (e.target as HTMLDivElement).getBoundingClientRect();
         const previousTaskFocused = rect.top + rect.height / 2 > e.clientY;
+
+        // TODO consider when target is last subtask.
+        let toSubtask = false;
+        if (props.task.parent === undefined) {
+          toSubtask = rect.x + rect.width / 2 < e.clientX;
+        }
+
         dispatch(
           updateTarget({
             toTasklistId: props.tasklistId,
             previousTaskId: previousTaskFocused ? props.previousTaskId : props.task.id,
+            toSubtask: toSubtask,
           })
         );
       }}
