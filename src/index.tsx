@@ -1,13 +1,13 @@
-import ReactDOM from "react-dom";
 import { StrictMode } from "react";
-import App from "./App";
-import "./index.css";
-import { Provider } from "react-redux";
-import store from "./store/store";
+import ReactDOM from "react-dom";
 import { QueryClientProvider } from "react-query";
-// import { ReactQueryDevtools } from "react-query-devtools";
-import { GapiAuthProvider } from "./lib/GapiAuthProvider";
+import { ReactQueryDevtools } from "react-query/devtools";
+import { Provider } from "react-redux";
+import App from "./App";
 import { queryClient } from "./globals";
+import "./index.css";
+import { GapiAuthProvider } from "./lib/GapiAuthProvider";
+import store from "./store/store";
 
 ReactDOM.render(
   <StrictMode>
@@ -16,6 +16,7 @@ ReactDOM.render(
         <GapiAuthProvider>
           <App />
         </GapiAuthProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </Provider>
   </StrictMode>,
