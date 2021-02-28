@@ -19,24 +19,43 @@ describe("sortTasks()", () => {
       { tasklistId: "list-1", position: "00000000000000000005", id: "task-5" },
     ];
     const result = sortTasks(input);
-    expect(result).toEqual([
+    const expected: Task[] = [
       { tasklistId: "list-1", position: "00000000000000000000", id: "task-0" },
       { tasklistId: "list-1", position: "00000000000000000001", id: "task-1" },
       { tasklistId: "list-1", position: "00000000000000000000", id: "subtask-1-0", parent: "task-1" },
       { tasklistId: "list-1", position: "00000000000000000001", id: "subtask-1-1", parent: "task-1" },
-      { tasklistId: "list-1", position: "00000000000000000002", id: "subtask-1-2", parent: "task-1" },
+      {
+        tasklistId: "list-1",
+        position: "00000000000000000002",
+        id: "subtask-1-2",
+        parent: "task-1",
+        isLastChild: true,
+      },
       { tasklistId: "list-1", position: "00000000000000000002", id: "task-2" },
       { tasklistId: "list-1", position: "00000000000000000003", id: "task-3" },
-      { tasklistId: "list-1", position: "00000000000000000000", id: "subtask-3-0", parent: "task-3" },
+      {
+        tasklistId: "list-1",
+        position: "00000000000000000000",
+        id: "subtask-3-0",
+        parent: "task-3",
+        isLastChild: true,
+      },
       { tasklistId: "list-1", position: "00000000000000000004", id: "task-4" },
       { tasklistId: "list-1", position: "00000000000000000005", id: "task-5" },
       { tasklistId: "list-1", position: "00000000000000000006", id: "task-6" },
       { tasklistId: "list-1", position: "00000000000000000000", id: "subtask-6-0", parent: "task-6" },
-      { tasklistId: "list-1", position: "00000000000000000001", id: "subtask-6-1", parent: "task-6" },
-    ]);
+      {
+        tasklistId: "list-1",
+        position: "00000000000000000001",
+        id: "subtask-6-1",
+        parent: "task-6",
+        isLastChild: true,
+      },
+    ];
+    expect(result).toEqual(expected);
   });
 
-  it("sorts tasks which includes subtasks", () => {
+  it("sorts tasks with temporary tasks", () => {
     const input: Task[] = [
       { tasklistId: "list-1", position: "00000000000000000003", id: "task-3" },
       { tasklistId: "list-1", position: "00000000000000000004", id: "task-4" },

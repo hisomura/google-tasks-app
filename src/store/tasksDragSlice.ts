@@ -7,30 +7,27 @@ import { RootState } from "./store";
 
 export type TasksDragState = {
   dragState: "yet-started" | "dragging" | "drop-animation" | "cancel-animation";
-  toSubtask: boolean;
   toTasklistId: string | null;
-  targetTaskId: string | null;
+  targetTaskId?: string;
+  onLeft?: boolean;
 };
 
 export const tasksDragSlice = createSlice<TasksDragState, SliceCaseReducers<TasksDragState>>({
   name: "tasksDrag",
   initialState: {
     dragState: "yet-started",
-    toSubtask: false,
     toTasklistId: null,
-    targetTaskId: null,
+    targetTaskId: undefined,
+    onLeft: undefined,
   },
   reducers: {
     dragStart: (state) => {
       state.dragState = "dragging";
     },
-    updateTarget: (
-      state,
-      action: { payload: { toTasklistId?: string; previousTaskId?: string; toSubtask: boolean } }
-    ) => {
+    updateTarget: (state, action: { payload: { toTasklistId?: string; targetTaskId?: string; onLeft?: boolean } }) => {
       state.toTasklistId = action.payload.toTasklistId ?? null;
-      state.targetTaskId = action.payload.previousTaskId ?? null;
-      state.toSubtask = action.payload.toSubtask;
+      state.targetTaskId = action.payload.targetTaskId;
+      state.onLeft = action.payload.onLeft;
     },
     dropProcessStart: (state, _action: { payload: { toTasklistId: string } }) => {
       state.dragState = "drop-animation";
@@ -41,7 +38,8 @@ export const tasksDragSlice = createSlice<TasksDragState, SliceCaseReducers<Task
     initTaskDragState: (state, _action: {}) => {
       state.dragState = "yet-started";
       state.toTasklistId = null;
-      state.targetTaskId = null;
+      state.targetTaskId = undefined;
+      state.onLeft = undefined;
     },
   },
 });
@@ -60,13 +58,19 @@ export const drop = (toTasklistId: string) => async (
 ) => {
   dispatch(tasksDragSlice.actions.dropProcessStart({ toTasklistId: toTasklistId }));
   const taskIds = Object.values(getState()["selectedTaskIds"]) as string[];
-  const previousTaskId = getState()["tasksDrag"].targetTaskId as string | undefined;
-  const toSubtask = getState()["tasksDrag"].toSubtask as boolean;
+  const targetTaskId = getState()["tasksDrag"].targetTaskId as string | undefined;
+  const onLeft = getState()["tasksDrag"].onLeft as boolean | undefined;
 
   const tasks = getTasksByIdsFromQueryClient(queryClient, taskIds);
+  let targetTask;
+  if (targetTaskId) {
+    const result = getTasksByIdsFromQueryClient(queryClient, [targetTaskId]);
+    targetTask = result[0];
+  }
 
-  optimisticUpdatesForMoveTasks(queryClient, tasks, { tasklistId: toTasklistId, prevTaskId: previousTaskId });
-  await moveTasks(tasks, toSubtask, toTasklistId, previousTaskId);
+  // FIXME consider subtask.
+  optimisticUpdatesForMoveTasks(queryClient, tasks, { tasklistId: toTasklistId, prevTaskId: targetTask?.id });
+  await moveTasks(tasks, toTasklistId, targetTask, onLeft);
 
   const tasklistIds = new Set(tasks.map((task) => task.tasklistId));
   tasklistIds.add(toTasklistId);

@@ -43,21 +43,10 @@ const TaskContainer: FC<Props> = (props) => {
       onDragOver={(e) => {
         // e.preventDefault();
         const rect = (e.target as HTMLDivElement).getBoundingClientRect();
-        const previousTaskFocused = rect.top + rect.height / 2 > e.clientY;
+        const targetTaskId = e.clientY < rect.top + rect.height / 2 ? props.previousTaskId : props.task.id;
+        const onLeft = e.clientX < rect.x + rect.width / 2;
 
-        // TODO consider when target is last subtask.
-        let toSubtask = false;
-        if (props.task.parent === undefined) {
-          toSubtask = rect.x + rect.width / 2 < e.clientX;
-        }
-
-        dispatch(
-          updateTarget({
-            toTasklistId: props.tasklistId,
-            previousTaskId: previousTaskFocused ? props.previousTaskId : props.task.id,
-            toSubtask: toSubtask,
-          })
-        );
+        dispatch(updateTarget({ toTasklistId: props.tasklistId, targetTaskId, onLeft }));
       }}
       onDragEnd={(_e) => {
         dispatch(dragEnd({}));

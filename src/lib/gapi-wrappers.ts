@@ -5,6 +5,7 @@ import { v4 as uuidV4 } from "uuid";
 interface Task extends GapiTask {
   tasklistId: string;
   id: string;
+  isLastChild?: boolean;
 }
 
 interface Tasklist extends GapiTaskList {
@@ -51,7 +52,7 @@ export function signOut() {
   return gapi.auth2.getAuthInstance().signOut();
 }
 
-export async function moveTasks(tasks: Task[], toSubtask: boolean, toTasklistId: string, previousTaskId?: string) {
+export async function moveTasks(tasks: Task[], toTasklistId: string, targetTask?: Task, onLeft?: boolean) {
   const tasksInAnotherTasklist = tasks.filter((task) => task.tasklistId !== toTasklistId);
   let newTaskIds: string[] = [];
 
@@ -62,36 +63,36 @@ export async function moveTasks(tasks: Task[], toSubtask: boolean, toTasklistId:
     .map((task) => task.id!)
     .concat(newTaskIds);
 
-  console.log("moveTaskIds", moveTaskIds);
   if (moveTaskIds.length === 0) return;
 
   const batch = gapi.client.newBatch();
   moveTaskIds.forEach((taskId) => {
-    // Is it easy to read ?
-    const request = {
+    const request: { tasklist: string; task: string; parent?: string; previous?: string } = {
       tasklist: toTasklistId,
       task: taskId,
-      ...(toSubtask ? { parent: previousTaskId } : { previous: previousTaskId }),
     };
+    if (targetTask !== undefined) {
+      // top level
+      if (targetTask.parent === undefined) {
+        if (onLeft) {
+          request.previous = targetTask.id;
+        } else {
+          request.parent = targetTask.id;
+        }
+        // sub task
+      } else {
+        if (targetTask.isLastChild && onLeft) {
+          request.previous = targetTask.parent;
+        } else {
+          request.parent = targetTask.parent;
+          request.previous = targetTask.id;
+        }
+      }
+    }
+
     console.log("request", request);
     batch.add(gapi.client.tasks.tasks.move(request));
   });
-
-  // if (toSubtask) {
-  //   moveTaskIds.forEach((taskId) =>
-  //     batch.add(gapi.client.tasks.tasks.move({ tasklist: toTasklistId, task: taskId, parent: previousTaskId }))
-  //   );
-  // } else {
-  //   moveTaskIds.forEach((taskId) =>
-  //     batch.add(
-  //       gapi.client.tasks.tasks.move({
-  //         tasklist: toTasklistId,
-  //         task: taskId,
-  //         previous: previousTaskId,
-  //       })
-  //     )
-  //   );
-  // }
 
   return batch.then();
 }

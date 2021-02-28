@@ -31,6 +31,7 @@ export function sortTasks(input: Task[]): Task[] {
   tasks.sort(taskSortFunc);
   for (const subTasks of subTasksMap.values()) {
     subTasks.sort(taskSortFunc);
+    subTasks[subTasks.length - 1].isLastChild = true;
     const parentIndex = tasks.findIndex((task) => task.id === subTasks[0].parent);
     tasks.splice(parentIndex + 1, 0, ...subTasks);
   }
