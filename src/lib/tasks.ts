@@ -48,3 +48,29 @@ export function createTasksMap(tasks: Task[]) {
 
   return tasksMap;
 }
+
+export function getNextParentAndPrevious(targetTask?: Task, onLeft?: boolean) {
+  let parent: string | undefined;
+  let previous: string | undefined;
+
+  if (targetTask === undefined) return { parent: undefined, previous: undefined };
+
+  // top level
+  if (targetTask.parent === undefined) {
+    if (onLeft) {
+      previous = targetTask.id;
+    } else {
+      parent = targetTask.id;
+    }
+    // sub task
+  } else {
+    if (targetTask.isLastChild && onLeft) {
+      previous = targetTask.parent;
+    } else {
+      parent = targetTask.parent;
+      previous = targetTask.id;
+    }
+  }
+
+  return { parent, previous };
+}

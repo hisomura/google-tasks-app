@@ -1,13 +1,8 @@
 import { QueryClient } from "react-query";
 import { Task } from "./gapi-wrappers";
-import { createTasksMap } from "./tasks";
+import { createTasksMap, getNextParentAndPrevious } from "./tasks";
 
-type DragDestination = {
-  tasklistId: string;
-  prevTaskId: string | undefined;
-};
-
-function removeTasks(queryClient: QueryClient, tasksMap: Map<string, Task[]>) {
+function removeTasksFromClient(queryClient: QueryClient, tasksMap: Map<string, Task[]>) {
   tasksMap.forEach((tasks, tasklistId) => {
     const taskIds = tasks.map((task) => task.id);
     const queryKey = ["tasks", tasklistId];
@@ -17,23 +12,32 @@ function removeTasks(queryClient: QueryClient, tasksMap: Map<string, Task[]>) {
   });
 }
 
+// FIXME when multi tasks move to top order.
 export function optimisticUpdatesForMoveTasks(
   queryClient: QueryClient,
   tasks: Task[],
-  { tasklistId, prevTaskId }: DragDestination
+  toTasklistId: string,
+  targetTask?: Task,
+  onLeft?: boolean
 ) {
   const tasksMap = createTasksMap(tasks);
-  removeTasks(queryClient, tasksMap);
+  removeTasksFromClient(queryClient, tasksMap);
 
-  queryClient.setQueryData<Task[]>(["tasks", tasklistId], (oldData = []) => {
-    const prevTask = oldData.find((task) => task.id === prevTaskId);
+  queryClient.setQueryData<Task[]>(["tasks", toTasklistId], (oldData = []) => {
+    const { parent, previous } = getNextParentAndPrevious(targetTask, onLeft);
+    const prevTask = oldData.find((task) => task.id === previous);
     const positionBase = prevTask?.position ?? "";
-    const tmpTasks = tasks.map((task, index) => ({
-      ...task,
-      id: `tmp-id-${task.id}`,
-      tasklistId: tasklistId,
-      position: positionBase + index.toString().padStart(3, "0"),
-    }));
+
+    const reversed = [...tasks].reverse();
+    const tmpTasks = reversed.map((task, index) => {
+      return {
+        ...task,
+        id: `tmp-id-${task.id}`,
+        tasklistId: toTasklistId,
+        parent,
+        position: positionBase + index.toString().padStart(3, "0"),
+      };
+    });
 
     return [...oldData, ...tmpTasks];
   });

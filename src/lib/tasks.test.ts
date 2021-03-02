@@ -1,5 +1,5 @@
 import { Task } from "./gapi-wrappers";
-import { createTasksMap, sortTasks } from "./tasks";
+import { getNextParentAndPrevious, createTasksMap, sortTasks } from "./tasks";
 
 describe("sortTasks()", () => {
   it("sorts tasks which includes subtasks", () => {
@@ -104,5 +104,61 @@ describe("createTasksMap()", () => {
         ["list-6", [{ tasklistId: "list-6", position: "00000000000000000001", id: "task-6-1" }]],
       ])
     );
+  });
+});
+
+describe("test", () => {
+  it("when target task is undefined", () => {
+    const task = undefined;
+    const expected = { parent: undefined, previous: undefined };
+    expect(getNextParentAndPrevious(task, true)).toEqual(expected);
+    expect(getNextParentAndPrevious(task, false)).toEqual(expected);
+  });
+
+  it("when target task is top level and onLeft is true", () => {
+    const task = { tasklistId: "list-1", position: "00000000000000000000", id: "task-0" };
+    const onLeft = true;
+    const expected = { parent: undefined, previous: task.id };
+    expect(getNextParentAndPrevious(task, onLeft)).toEqual(expected);
+  });
+
+  it("when target task is top level and onLeft is false", () => {
+    const task = { tasklistId: "list-1", position: "00000000000000000000", id: "task-0" };
+    const onLeft = false;
+    const expected = { parent: task.id, previous: undefined };
+    expect(getNextParentAndPrevious(task, onLeft)).toEqual(expected);
+  });
+
+  it("when target task is subtask and not last in children", () => {
+    const task = { tasklistId: "list-1", position: "00000000000000000000", id: "task-0-1", parent: "task-0" };
+    const expected = { parent: task.parent, previous: "task-0-1" };
+    expect(getNextParentAndPrevious(task, true)).toEqual(expected);
+    expect(getNextParentAndPrevious(task, false)).toEqual(expected);
+  });
+
+  it("when target task is last subtask and onLeft is false ", () => {
+    const task = {
+      tasklistId: "list-1",
+      position: "00000000000000000000",
+      id: "task-0-1",
+      parent: "task-0",
+      isLastChild: true,
+    };
+    const onLeft = false;
+    const expected = { parent: task.parent, previous: "task-0-1" };
+    expect(getNextParentAndPrevious(task, onLeft)).toEqual(expected);
+  });
+
+  it("when target task is last subtask and onLeft is true ", () => {
+    const task = {
+      tasklistId: "list-1",
+      position: "00000000000000000000",
+      id: "task-0-1",
+      parent: "task-0",
+      isLastChild: true,
+    };
+    const onLeft = true;
+    const expected = { parent: undefined, previous: task.parent };
+    expect(getNextParentAndPrevious(task, onLeft)).toEqual(expected);
   });
 });

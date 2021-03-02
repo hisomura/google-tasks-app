@@ -68,8 +68,7 @@ export const drop = (toTasklistId: string) => async (
     targetTask = result[0];
   }
 
-  // FIXME consider subtask.
-  optimisticUpdatesForMoveTasks(queryClient, tasks, { tasklistId: toTasklistId, prevTaskId: targetTask?.id });
+  optimisticUpdatesForMoveTasks(queryClient, tasks, toTasklistId, targetTask, onLeft);
   await moveTasks(tasks, toTasklistId, targetTask, onLeft);
 
   const tasklistIds = new Set(tasks.map((task) => task.tasklistId));
@@ -83,6 +82,7 @@ export const drop = (toTasklistId: string) => async (
   dispatch(removeAllTaskIds({}));
 };
 
+// FIXME tasks order
 function getTasksByIdsFromQueryClient(queryClient: QueryClient, ids: string[]) {
   queryClient.getQueryCache().findAll("tasks");
   // @ts-ignore
