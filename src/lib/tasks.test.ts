@@ -62,16 +62,16 @@ describe("sortTasks()", () => {
       { tasklistId: "list-1", position: "00000000000000000001", id: "task-1" },
       { tasklistId: "list-1", position: "00000000000000000000", id: "task-0" },
       { tasklistId: "list-1", position: "00000000000000000002", id: "task-2" },
-      { tasklistId: "list-1", position: "000000000000000000020", id: "temporary-task-2-1" },
-      { tasklistId: "list-1", position: "000000000000000000021", id: "temporary-task-2-2" },
+      { tasklistId: "list-1", position: "00000000000000000002.010", id: "temporary-task-2-10" },
+      { tasklistId: "list-1", position: "00000000000000000002.001", id: "temporary-task-2-1" },
     ];
     const result = sortTasks(input);
     expect(result).toEqual([
       { tasklistId: "list-1", position: "00000000000000000000", id: "task-0" },
       { tasklistId: "list-1", position: "00000000000000000001", id: "task-1" },
       { tasklistId: "list-1", position: "00000000000000000002", id: "task-2" },
-      { tasklistId: "list-1", position: "000000000000000000020", id: "temporary-task-2-1" },
-      { tasklistId: "list-1", position: "000000000000000000021", id: "temporary-task-2-2" },
+      { tasklistId: "list-1", position: "00000000000000000002.001", id: "temporary-task-2-1" },
+      { tasklistId: "list-1", position: "00000000000000000002.010", id: "temporary-task-2-10" },
       { tasklistId: "list-1", position: "00000000000000000003", id: "task-3" },
       { tasklistId: "list-1", position: "00000000000000000004", id: "task-4" },
     ]);

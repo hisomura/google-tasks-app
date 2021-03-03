@@ -1,6 +1,6 @@
 import { QueryClient } from "react-query";
 import { Task } from "./gapi-wrappers";
-import { createTasksMap, getNextParentAndPrevious } from "./tasks";
+import { createTasksMap, getNextParentAndPrevious, sortTasks } from "./tasks";
 
 function removeTasksFromClient(queryClient: QueryClient, tasksMap: Map<string, Task[]>) {
   tasksMap.forEach((tasks, tasklistId) => {
@@ -26,16 +26,24 @@ export function optimisticUpdatesForMoveTasks(
   queryClient.setQueryData<Task[]>(["tasks", toTasklistId], (oldData = []) => {
     const { parent, previous } = getNextParentAndPrevious(targetTask, onLeft);
     const prevTask = oldData.find((task) => task.id === previous);
-    const positionBase = prevTask?.position ?? "";
+    const positionBase = prevTask?.position!;
 
-    const reversed = [...tasks].reverse();
-    const tmpTasks = reversed.map((task, index) => {
+    // FIXME consider multi tasklist
+    const sortedTasks = sortTasks(tasks);
+    const tmpTasks = sortedTasks.map((task, index) => {
+      let tmpPosition;
+      if (positionBase) {
+        tmpPosition = `${positionBase}.` + (index + 1).toString().padStart(3, "0");
+      } else {
+        tmpPosition = (-100 + index).toString();
+      }
+
       return {
         ...task,
         id: `tmp-id-${task.id}`,
         tasklistId: toTasklistId,
         parent,
-        position: positionBase + index.toString().padStart(3, "0"),
+        position: tmpPosition,
       };
     });
 

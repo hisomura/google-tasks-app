@@ -24,16 +24,16 @@ describe("createInsertTasksUpdater", () => {
 
     optimisticUpdatesForMoveTasks(queryClient, newTasks, "list-1", oldTasks[2], true);
 
-    expect(queryClient.getQueryData(["tasks", "list-1"])).toEqual([
+    const expected: Task[] = [
       { tasklistId: "list-1", position: "00000000000000000004", id: "task-4" },
       { tasklistId: "list-1", position: "00000000000000000001", id: "task-1" },
       { tasklistId: "list-1", position: "00000000000000000000", id: "task-0" },
       { tasklistId: "list-1", position: "00000000000000000002", id: "task-2" },
-      { tasklistId: "list-1", position: "00000000000000000001000", id: "tmp-id-task-3" },
-      { tasklistId: "list-1", position: "00000000000000000001001", id: "tmp-id-task-from-list-4" },
-      { tasklistId: "list-1", position: "00000000000000000001002", id: "tmp-id-task-from-list-3" },
-    ]);
-
+      { tasklistId: "list-1", position: "00000000000000000001.001", id: "tmp-id-task-from-list-4", isLastChild: true },
+      { tasklistId: "list-1", position: "00000000000000000001.002", id: "tmp-id-task-3" },
+      { tasklistId: "list-1", position: "00000000000000000001.003", id: "tmp-id-task-from-list-3" },
+    ];
+    expect(queryClient.getQueryData(["tasks", "list-1"])).toEqual(expected);
     expect(queryClient.getQueryData(["tasks", "list-3"])).toEqual([]);
     expect(queryClient.getQueryData(["tasks", "list-4"])).toEqual([]);
   });
@@ -64,9 +64,36 @@ describe("createInsertTasksUpdater", () => {
       { tasklistId: "list-1", position: "00000000000000000001", id: "task-1" },
       { tasklistId: "list-1", position: "00000000000000000000", id: "task-0" },
       { tasklistId: "list-1", position: "00000000000000000002", id: "task-2" },
-      { tasklistId: "list-1", position: "000", id: "tmp-id-task-3", parent: "task-1" },
-      { tasklistId: "list-1", position: "001", id: "tmp-id-task-from-list-4", parent: "task-1" },
-      { tasklistId: "list-1", position: "002", id: "tmp-id-task-from-list-3", parent: "task-1" },
+      { tasklistId: "list-1", position: "-100", id: "tmp-id-task-3", parent: "task-1" },
+      { tasklistId: "list-1", position: "-99", id: "tmp-id-task-from-list-3", parent: "task-1" },
+      { tasklistId: "list-1", position: "-98", id: "tmp-id-task-from-list-4", parent: "task-1" },
+    ];
+    expect(queryClient.getQueryData(["tasks", "list-1"])).toEqual(expected);
+  });
+
+  test("when tasks move to top", () => {
+    const oldTasks: Task[] = [
+      { tasklistId: "list-1", position: "00000000000000000001", id: "task-1" },
+      { tasklistId: "list-1", position: "00000000000000000000", id: "task-0" },
+    ];
+    const newTasks: Task[] = [
+      { tasklistId: "list-3", position: "00000000000000000005", id: "task-from-list-3-1" },
+      { tasklistId: "list-3", position: "00000000000000000008", id: "task-from-list-3-2" },
+      { tasklistId: "list-1", position: "00000000000000000003", id: "task-3" },
+    ];
+
+    const queryClient = new QueryClient();
+    queryClient.setQueryData(["tasks", "list-1"], () => oldTasks);
+    queryClient.setQueryData(["tasks", "list-3"], () => [newTasks[0], newTasks[1]]);
+
+    optimisticUpdatesForMoveTasks(queryClient, newTasks, "list-1", undefined, false);
+
+    const expected: Task[] = [
+      { tasklistId: "list-1", position: "00000000000000000001", id: "task-1" },
+      { tasklistId: "list-1", position: "00000000000000000000", id: "task-0" },
+      { tasklistId: "list-1", position: "-100", id: "tmp-id-task-3" },
+      { tasklistId: "list-1", position: "-99", id: "tmp-id-task-from-list-3-1" },
+      { tasklistId: "list-1", position: "-98", id: "tmp-id-task-from-list-3-2" },
     ];
     expect(queryClient.getQueryData(["tasks", "list-1"])).toEqual(expected);
   });
