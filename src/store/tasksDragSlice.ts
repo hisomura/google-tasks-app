@@ -1,7 +1,7 @@
 import { createSlice, SliceCaseReducers } from "@reduxjs/toolkit";
 import { QueryClient } from "react-query";
-import { moveTasks, Task } from "../lib/gapi-wrappers";
-import { optimisticUpdatesForMoveTasks } from "../lib/react-query-helper";
+import { moveTasks } from "../lib/gapi-wrappers";
+import { getTasksByIdsFromQueryClient, optimisticUpdatesForMoveTasks } from "../lib/react-query-helper";
 import { removeAllTaskIds } from "./selectedTaskIdsSlice";
 import { RootState } from "./store";
 
@@ -81,15 +81,3 @@ export const drop = (toTasklistId: string) => async (
   dispatch(tasksDragSlice.actions.initTaskDragState({}));
   dispatch(removeAllTaskIds({}));
 };
-
-// FIXME tasks order
-function getTasksByIdsFromQueryClient(queryClient: QueryClient, ids: string[]) {
-  queryClient.getQueryCache().findAll("tasks");
-  // @ts-ignore
-  const allTasks = queryClient
-    .getQueryCache()
-    .findAll("tasks")
-    // @ts-ignore
-    .reduce((acc, query) => [...acc, ...query.state.data], []) as Task[];
-  return allTasks.filter((task) => ids.includes(task.id));
-}

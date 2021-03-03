@@ -1,6 +1,6 @@
 import { QueryClient } from "react-query";
 import { Task } from "./gapi-wrappers";
-import { optimisticUpdatesForMoveTasks } from "./react-query-helper";
+import { getTasksByIdsFromQueryClient, optimisticUpdatesForMoveTasks } from "./react-query-helper";
 
 describe("createInsertTasksUpdater", () => {
   test("removes and adds temporary task data to query cache", () => {
@@ -69,5 +69,34 @@ describe("createInsertTasksUpdater", () => {
       { tasklistId: "list-1", position: "002", id: "tmp-id-task-from-list-3", parent: "task-1" },
     ];
     expect(queryClient.getQueryData(["tasks", "list-1"])).toEqual(expected);
+  });
+});
+
+describe("getTasksByIdsFromQueryClient", () => {
+  test("get tasks by task id", () => {
+    const queryClient = new QueryClient();
+    queryClient.setQueryData(["tasks", "list-1"], () => [
+      { tasklistId: "list-1", position: "00000000000000000003", id: "task-1-3" },
+      { tasklistId: "list-1", position: "00000000000000000001", id: "task-1-1" },
+      { tasklistId: "list-1", position: "00000000000000000000", id: "task-1-0" },
+      { tasklistId: "list-1", position: "00000000000000000002", id: "task-1-2" },
+    ]);
+    queryClient.setQueryData(["tasks", "list-2"], () => [
+      { tasklistId: "list-2", position: "00000000000000000000", id: "task-2-0" },
+      { tasklistId: "list-2", position: "00000000000000000002", id: "task-2-2" },
+      { tasklistId: "list-2", position: "00000000000000000003", id: "task-2-3" },
+      { tasklistId: "list-2", position: "00000000000000000001", id: "task-2-1" },
+    ]);
+    queryClient.setQueryData(["tasks", "list-3"], () => [
+      { tasklistId: "list-3", position: "00000000000000000001", id: "task-3-1" },
+      { tasklistId: "list-3", position: "00000000000000000002", id: "task-3-2" },
+      { tasklistId: "list-3", position: "00000000000000000003", id: "task-3-3" },
+      { tasklistId: "list-3", position: "00000000000000000000", id: "task-3-0" },
+    ]);
+
+    const ids = ["task-2-1", "task-2-0", "task-3-3", "task-3-0", "task-1-0", "task-2-2"];
+    const tasks = getTasksByIdsFromQueryClient(queryClient, ids);
+    const returnTaskIds = new Set(tasks.map((task) => task.id));
+    expect(returnTaskIds).toEqual(new Set(ids));
   });
 });

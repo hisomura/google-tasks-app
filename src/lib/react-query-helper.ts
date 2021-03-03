@@ -42,3 +42,24 @@ export function optimisticUpdatesForMoveTasks(
     return [...oldData, ...tmpTasks];
   });
 }
+
+export function getTasksByIdsFromQueryClient(queryClient: QueryClient, ids: string[]) {
+  const taskMap = new Map<string, Task>();
+  // @ts-ignore
+  queryClient
+    .getQueryCache()
+    .findAll("tasks")
+    .forEach((query) => {
+      const tasks = query.state.data as Task[];
+      tasks.forEach((task) => taskMap.set(task.id, task));
+    });
+
+  return ids.map((id) => {
+    const task = taskMap.get(id);
+    if (!task) {
+      throw Error(`id:${id} のタスクqueryClient内に存在しない`);
+    }
+
+    return task;
+  });
+}
