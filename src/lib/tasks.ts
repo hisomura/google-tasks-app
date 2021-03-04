@@ -1,6 +1,6 @@
-import { Task } from "./gapi-wrappers";
+import { Task, Tasklist } from "./gapi-wrappers";
 
-const taskSortFunc = (a: Task, b: Task) => {
+const compareTaskOrder = (a: Task, b: Task) => {
   return parseFloat(a.position!) - parseFloat(b.position!);
 };
 
@@ -22,15 +22,28 @@ export function sortTasks(input: Task[]): Task[] {
     }
   });
 
-  tasks.sort(taskSortFunc);
+  tasks.sort(compareTaskOrder);
   for (const subTasks of subTasksMap.values()) {
-    subTasks.sort(taskSortFunc);
+    subTasks.sort(compareTaskOrder);
     subTasks[subTasks.length - 1].isLastChild = true;
     const parentIndex = tasks.findIndex((task) => task.id === subTasks[0].parent);
     tasks.splice(parentIndex + 1, 0, ...subTasks);
   }
 
   return tasks;
+}
+
+// FIXME name
+export function sortTasksWithTasklistOrder(tasklists: Tasklist[], tasks: Task[]) {
+  const tasklistOrderMap = new Map<Tasklist["id"], number>();
+  tasklists.forEach((tasklist, index) => tasklistOrderMap.set(tasklist.id, index));
+
+  return [...tasks].sort((a, b) => {
+    const listOrderDiff = tasklistOrderMap.get(a.tasklistId)! - tasklistOrderMap.get(b.tasklistId)!;
+    if (listOrderDiff !== 0) return listOrderDiff;
+
+    return parseFloat(a.position!) - parseFloat(b.position!);
+  });
 }
 
 export function createTasksMap(tasks: Task[]) {

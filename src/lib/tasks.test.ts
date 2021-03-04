@@ -1,5 +1,5 @@
-import { Task } from "./gapi-wrappers";
-import { getNextParentAndPrevious, createTasksMap, sortTasks } from "./tasks";
+import { Task, Tasklist } from "./gapi-wrappers";
+import { getNextParentAndPrevious, createTasksMap, sortTasks, sortTasksWithTasklistOrder } from "./tasks";
 
 describe("sortTasks()", () => {
   it("sorts tasks which includes subtasks", () => {
@@ -107,7 +107,7 @@ describe("createTasksMap()", () => {
   });
 });
 
-describe("test", () => {
+describe("getNextParentAndPrevious()", () => {
   it("when target task is undefined", () => {
     const task = undefined;
     const expected = { parent: undefined, previous: undefined };
@@ -160,5 +160,26 @@ describe("test", () => {
     const onLeft = true;
     const expected = { parent: undefined, previous: task.parent };
     expect(getNextParentAndPrevious(task, onLeft)).toEqual(expected);
+  });
+});
+
+describe("sortTasksForMultiListTasks()", () => {
+  it("sorts tasks considering their tasklist order", () => {
+    const inputTasklist: Tasklist[] = [{ id: "list-1" }, { id: "list-3" }, { id: "list-2" }];
+    const inputTasks: Task[] = [
+      { tasklistId: "list-2", position: "00000000000000000001", id: "task-2-1" },
+      { tasklistId: "list-1", position: "00000000000000000001", id: "task-1-1" },
+      { tasklistId: "list-3", position: "00000000000000000001", id: "task-3-1" },
+      { tasklistId: "list-1", position: "00000000000000000000", id: "task-1-0" },
+      { tasklistId: "list-2", position: "00000000000000000000", id: "task-2-0" },
+      { tasklistId: "list-3", position: "00000000000000000000", id: "task-3-0" },
+    ];
+    const result = sortTasksWithTasklistOrder(inputTasklist, inputTasks);
+    expect(result[0].id).toEqual("task-1-0");
+    expect(result[1].id).toEqual("task-1-1");
+    expect(result[2].id).toEqual("task-3-0");
+    expect(result[3].id).toEqual("task-3-1");
+    expect(result[4].id).toEqual("task-2-0");
+    expect(result[5].id).toEqual("task-2-1");
   });
 });
