@@ -1,6 +1,7 @@
 import GapiTask = gapi.client.tasks.Task;
 import GapiTaskList = gapi.client.tasks.TaskList;
 import { v4 as uuidV4 } from "uuid";
+import { getNextParentAndPrevious } from "./tasks";
 
 interface Task extends GapiTask {
   tasklistId: string;
@@ -69,30 +70,8 @@ export async function moveTasks(tasks: Task[], toTasklistId: string, targetTask?
 
   const batch = gapi.client.newBatch();
   moveTaskIds.forEach((taskId) => {
-    const request: { tasklist: string; task: string; parent?: string; previous?: string } = {
-      tasklist: toTasklistId,
-      task: taskId,
-    };
-    if (targetTask !== undefined) {
-      // top level
-      if (targetTask.parent === undefined) {
-        if (onLeft) {
-          request.previous = targetTask.id;
-        } else {
-          request.parent = targetTask.id;
-        }
-        // sub task
-      } else {
-        if (targetTask.isLastChild && onLeft) {
-          request.previous = targetTask.parent;
-        } else {
-          request.parent = targetTask.parent;
-          request.previous = targetTask.id;
-        }
-      }
-    }
-
-    console.log("request", request);
+    const { parent, previous } = getNextParentAndPrevious(targetTask, onLeft);
+    const request = { tasklist: toTasklistId, task: taskId, previous, parent };
     batch.add(gapi.client.tasks.tasks.move(request));
   });
 
