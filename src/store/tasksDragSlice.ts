@@ -1,7 +1,8 @@
 import { createSlice, SliceCaseReducers } from "@reduxjs/toolkit";
 import { QueryClient } from "react-query";
-import { moveTasks } from "../lib/gapi-wrappers";
+import { moveTasks, Tasklist } from "../lib/gapi-wrappers";
 import { getTasksByIdsFromQueryClient, optimisticUpdatesForMoveTasks } from "../lib/react-query-helper";
+import { sortTasksWithTasklistOrder } from "../lib/tasks";
 import { removeAllTaskIds } from "./selectedTaskIdsSlice";
 import { RootState } from "./store";
 
@@ -68,8 +69,12 @@ export const drop = (toTasklistId: string) => async (
     targetTask = result[0];
   }
 
-  optimisticUpdatesForMoveTasks(queryClient, tasks, toTasklistId, targetTask, onLeft);
-  await moveTasks(tasks, toTasklistId, targetTask, onLeft);
+  const tasklists = queryClient.getQueryData<Tasklist[]>("tasklists");
+  if (!tasklists) throw new Error("Not found Tasklists cache.");
+  const sortedTasks = sortTasksWithTasklistOrder(tasklists, tasks);
+
+  optimisticUpdatesForMoveTasks(queryClient, sortedTasks, toTasklistId, targetTask, onLeft);
+  await moveTasks(sortedTasks, toTasklistId, targetTask, onLeft);
 
   const tasklistIds = new Set(tasks.map((task) => task.tasklistId));
   tasklistIds.add(toTasklistId);

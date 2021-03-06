@@ -1,6 +1,6 @@
 import { QueryClient } from "react-query";
 import { Task } from "./gapi-wrappers";
-import { createTasksMap, getNextParentAndPrevious, sortTasks } from "./tasks";
+import { createTasksMap, getNextParentAndPrevious } from "./tasks";
 
 function removeTasksFromClient(queryClient: QueryClient, tasksMap: Map<string, Task[]>) {
   tasksMap.forEach((tasks, tasklistId) => {
@@ -28,9 +28,7 @@ export function optimisticUpdatesForMoveTasks(
     const prevTask = oldData.find((task) => task.id === previous);
     const positionBase = prevTask?.position!;
 
-    // FIXME consider multi tasklist
-    const sortedTasks = sortTasks(tasks);
-    const tmpTasks = sortedTasks.map((task, index) => {
+    const tmpTasks = tasks.map((task, index) => {
       let tmpPosition;
       if (positionBase) {
         tmpPosition = `${positionBase}.` + (index + 1).toString().padStart(3, "0");

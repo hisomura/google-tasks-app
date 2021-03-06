@@ -1,7 +1,6 @@
 import GapiTask = gapi.client.tasks.Task;
 import GapiTaskList = gapi.client.tasks.TaskList;
 import { v4 as uuidV4 } from "uuid";
-import { sortTasks } from "./tasks";
 
 interface Task extends GapiTask {
   tasklistId: string;
@@ -54,13 +53,13 @@ export function signOut() {
 }
 
 export async function moveTasks(tasks: Task[], toTasklistId: string, targetTask?: Task, onLeft?: boolean) {
-  // FIXME
-  const sorted = targetTask ? sortTasks(tasks) : sortTasks(tasks).reverse();
+  const sorted = targetTask ? tasks : [...tasks].reverse();
   const tasksInAnotherTasklist = sorted.filter((task) => task.tasklistId !== toTasklistId);
   let newTaskIds: string[] = [];
 
   if (tasksInAnotherTasklist.length > 0) newTaskIds = await recreateTasks(tasksInAnotherTasklist, toTasklistId);
 
+  // FIXME stay tasks order
   const moveTaskIds: string[] = sorted
     .filter((task) => task.tasklistId === toTasklistId)
     .map((task) => task.id!)
