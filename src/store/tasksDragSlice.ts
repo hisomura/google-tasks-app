@@ -49,8 +49,13 @@ export const { dragStart, updateTarget, dragEnd, initTaskDragState } = tasksDrag
 
 export default tasksDragSlice;
 
-export const isDragTarget = (tasklistId: string, previousTaskId?: string) => (rootState: RootState) =>
-  rootState.tasksDrag.toTasklistId === tasklistId && rootState.tasksDrag.targetTaskId === previousTaskId;
+export const selectedSelector = (tasklistId: string, previousTaskId?: string) => (rootState: RootState) => {
+  if (rootState.tasksDrag.toTasklistId !== tasklistId || rootState.tasksDrag.targetTaskId !== previousTaskId) {
+    return undefined;
+  }
+
+  return rootState.tasksDrag.onLeft ? "left" : "right";
+};
 
 export const drop = (toTasklistId: string) => async (
   dispatch: Function,
