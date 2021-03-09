@@ -29,3 +29,5 @@ export const { addTaskIds, removeTaskIds, removeAllTaskIds, replaceAllTaskIds } 
 export default selectedTaskIdsSlice.reducer;
 
 export const isSelectedSelector = (id: string) => (rootState: RootState) => id in rootState.selectedTaskIds;
+
+export const selectedTaskExists = (rootState: RootState) => Object.keys(rootState.selectedTaskIds).length > 0;
