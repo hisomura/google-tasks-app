@@ -1,4 +1,7 @@
 import { createSlice, SliceCaseReducers } from "@reduxjs/toolkit";
+import { QueryClient } from "react-query";
+import { deleteTasks as gapiDeleteTasks, Task } from "../lib/gapi-wrappers";
+import { getTasksByIdsFromQueryClient } from "../lib/react-query-helper";
 import { RootState } from "./store";
 
 type State = { [key: string]: string };
@@ -31,3 +34,28 @@ export default selectedTaskIdsSlice.reducer;
 export const isSelectedSelector = (id: string) => (rootState: RootState) => id in rootState.selectedTaskIds;
 
 export const selectedTaskExists = (rootState: RootState) => Object.keys(rootState.selectedTaskIds).length > 0;
+
+// FIXME rename
+export const deleteTasks = () => async (
+  dispatch: Function,
+  getState: Function,
+  { queryClient }: { queryClient: QueryClient }
+) => {
+  // FIXME implement optimistic delete
+  const taskIds = Object.values(getState()["selectedTaskIds"]) as string[];
+  const tasks = getTasksByIdsFromQueryClient(queryClient, taskIds);
+  const invalidate = createInvalidateTasks(queryClient, tasks);
+
+  await gapiDeleteTasks(tasks);
+  dispatch(removeAllTaskIds({}));
+  await invalidate();
+};
+
+function createInvalidateTasks(queryClient: QueryClient, tasks: Task[]) {
+  const tasklistIds = new Set(tasks.map((task) => task.tasklistId));
+
+  return () => {
+    const promises = Array.from(tasklistIds).map((tasklistId) => queryClient.invalidateQueries(["tasks", tasklistId]));
+    return Promise.all(promises);
+  };
+}

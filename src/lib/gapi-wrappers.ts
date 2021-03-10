@@ -53,6 +53,16 @@ export function signOut() {
   return gapi.auth2.getAuthInstance().signOut();
 }
 
+export async function deleteTasks(tasks: Task[]) {
+  const batch = gapi.client.newBatch();
+  tasks.forEach((task) => {
+    const request = { tasklist: task.tasklistId, task: task.id };
+    batch.add(gapi.client.tasks.tasks.delete(request));
+  });
+
+  return batch.then();
+}
+
 export async function moveTasks(tasks: Task[], toTasklistId: string, targetTask?: Task, onLeft?: boolean) {
   const sorted = targetTask ? tasks : [...tasks].reverse();
   const tasksInAnotherTasklist = sorted.filter((task) => task.tasklistId !== toTasklistId);
