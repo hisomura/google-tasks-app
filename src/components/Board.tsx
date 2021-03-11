@@ -1,18 +1,15 @@
 import { FC } from "react";
 import { useQuery } from "react-query";
-import TasklistContainer from "./TasklistContainer";
 import { getTasklists, signOut } from "../lib/gapi-wrappers";
-import { removeAllTaskIds } from "../store/selectedTaskIdsSlice";
-import { useDispatch } from "react-redux";
+import TasklistContainer from "./TasklistContainer";
 
 const Board: FC = () => {
-  const dispatch = useDispatch();
   const { isLoading, data } = useQuery("tasklists", getTasklists);
 
   if (isLoading) return <>"Loading..."</>;
 
   return (
-    <div onClick={() => dispatch(removeAllTaskIds({}))} draggable={false} className="select-none">
+    <div draggable={false} className="select-none">
       <button type="button" onClick={signOut} className="m-8 border select-none">
         Sign out.
       </button>

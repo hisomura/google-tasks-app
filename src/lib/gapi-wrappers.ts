@@ -54,6 +54,9 @@ export function signOut() {
 }
 
 export async function deleteTasks(tasks: Task[]) {
+  if (tasks.length === 0) {
+    throw new Error("Tasks have no item.");
+  }
   const batch = gapi.client.newBatch();
   tasks.forEach((task) => {
     const request = { tasklist: task.tasklistId, task: task.id };

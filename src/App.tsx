@@ -1,8 +1,8 @@
 import { MouseEventHandler } from "react";
-import ContextMenu from "./components/ContextMenu";
-import { useGapiAuth } from "./lib/GapiAuthProvider";
 import Board from "./components/Board";
+import ContextMenu from "./components/ContextMenu";
 import RectangleSelection from "./components/RectangleSelection";
+import { useGapiAuth } from "./lib/GapiAuthProvider";
 
 const signInClickHandler: MouseEventHandler<HTMLButtonElement> = (_event) => {
   gapi.auth2.getAuthInstance().signIn();
@@ -24,10 +24,10 @@ export default function App() {
   }
 
   return (
-    <ContextMenu>
-      <RectangleSelection>
+    <RectangleSelection>
+      <ContextMenu>
         <Board />
-      </RectangleSelection>
-    </ContextMenu>
+      </ContextMenu>
+    </RectangleSelection>
   );
 }

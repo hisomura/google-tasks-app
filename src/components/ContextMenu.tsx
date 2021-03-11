@@ -1,12 +1,6 @@
-import React, { FC, useReducer, useState } from "react";
+import React, { FC, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { isSelectedSelector, replaceAllTaskIds, selectedTaskExists } from "../store/selectedTaskIdsSlice";
-
-const parentStyle: React.CSSProperties = {
-  position: "relative",
-  width: "100vw",
-  height: "100vh",
-};
+import { deleteTasks, selectedTaskExists } from "../store/selectedTaskIdsSlice";
 
 type MenuPosition = {
   x: number;
@@ -18,19 +12,32 @@ function getMenuStyle(position: MenuPosition): React.CSSProperties {
     position: "absolute",
     top: position.y,
     left: position.x,
-    width: 100,
+    width: 200,
     height: 100,
     backgroundColor: "#aaa",
   };
 }
 
 const Menu: FC<{ position: MenuPosition }> = ({ position }) => {
-  return <div style={getMenuStyle(position)}>This is ContextMenu!</div>;
+  const dispatch = useDispatch();
+  return (
+    <ul style={getMenuStyle(position)} onMouseDown={(e) => e.stopPropagation()}>
+      <li
+        onClick={(e) => {
+          e.stopPropagation();
+          dispatch(deleteTasks());
+        }}
+      >
+        Delete
+      </li>
+      <li>Set time</li>
+      <li>Edit details</li>
+    </ul>
+  );
 };
 
 const ContextMenu: FC = ({ children }) => {
   const selected = useSelector(selectedTaskExists);
-  // const selected = false
   const [position, setPosition] = useState<MenuPosition | null>(null);
   return (
     <div
