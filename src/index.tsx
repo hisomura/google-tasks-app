@@ -8,17 +8,20 @@ import { queryClient } from "./globals";
 import "./index.css";
 import { GapiAuthProvider } from "./lib/GapiAuthProvider";
 import store from "./store/store";
+import { ChakraProvider } from "@chakra-ui/react";
 
 ReactDOM.render(
   <StrictMode>
-    <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <GapiAuthProvider>
-          <App />
-        </GapiAuthProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
-    </Provider>
+    <ChakraProvider>
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <GapiAuthProvider>
+            <App />
+          </GapiAuthProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </Provider>
+    </ChakraProvider>
   </StrictMode>,
   document.getElementById("root")
 );

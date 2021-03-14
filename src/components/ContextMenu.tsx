@@ -36,8 +36,6 @@ const Menu: FC<{ position: MenuPosition }> = ({ position }) => {
       >
         Delete
       </li>
-      <li>Set time</li>
-      <li>Edit details</li>
     </ul>
   );
 };

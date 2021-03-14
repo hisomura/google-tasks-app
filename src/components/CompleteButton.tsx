@@ -1,6 +1,6 @@
 import { MdDone, MdPanoramaFishEye } from "react-icons/md";
 import { FC, MouseEventHandler } from "react";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 
 const Div = styled.div`
   position: relative;
