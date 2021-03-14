@@ -1,6 +1,7 @@
 import React, { FC, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteTasks, selectedTaskExists } from "../store/selectedTaskIdsSlice";
+import { Box } from "@chakra-ui/react";
 
 const parentStyle: React.CSSProperties = {
   position: "relative",
@@ -13,30 +14,29 @@ type MenuPosition = {
   y: number;
 };
 
-function getMenuStyle(position: MenuPosition): React.CSSProperties {
-  return {
-    position: "absolute",
-    top: position.y,
-    left: position.x,
-    width: 200,
-    height: 100,
-    backgroundColor: "#aaa",
-  };
-}
-
 const Menu: FC<{ position: MenuPosition }> = ({ position }) => {
   const dispatch = useDispatch();
   return (
-    <ul style={getMenuStyle(position)} onMouseDown={(e) => e.stopPropagation()}>
-      <li
-        onClick={(e) => {
-          e.stopPropagation();
-          dispatch(deleteTasks());
-        }}
-      >
-        Delete
-      </li>
-    </ul>
+    <Box
+      maxW="sm"
+      borderWidth="1px"
+      borderRadius="lg"
+      overflow="hidden"
+      position={"absolute"}
+      backgroundColor="#fff"
+      top={position.y}
+      left={position.x}
+      px={3}
+      py={3}
+      cursor={"default"}
+      onMouseDown={(e) => e.stopPropagation()}
+      onClick={(e) => {
+        e.stopPropagation();
+        dispatch(deleteTasks());
+      }}
+    >
+      Delete
+    </Box>
   );
 };
 
