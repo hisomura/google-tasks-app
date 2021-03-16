@@ -1,7 +1,7 @@
 import React, { FC, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteTasks, selectedTaskExists } from "../store/selectedTaskIdsSlice";
-import { Box } from "@chakra-ui/react";
+import { Box, Menu, MenuItem } from "@chakra-ui/react";
 
 const parentStyle: React.CSSProperties = {
   position: "relative",
@@ -14,33 +14,27 @@ type MenuPosition = {
   y: number;
 };
 
-const Menu: FC<{ position: MenuPosition }> = ({ position }) => {
+const ContextMenu: FC<{ position: MenuPosition }> = ({ position }) => {
   const dispatch = useDispatch();
   return (
-    <Box
-      maxW="sm"
-      borderWidth="1px"
-      borderRadius="lg"
-      overflow="hidden"
-      position={"absolute"}
-      backgroundColor="#fff"
-      top={position.y}
-      left={position.x}
-      px={3}
-      py={3}
-      cursor={"default"}
-      onMouseDown={(e) => e.stopPropagation()}
-      onClick={(e) => {
-        e.stopPropagation();
-        dispatch(deleteTasks());
-      }}
-    >
-      Delete
+    <Box position={"absolute"} top={position.y} left={position.x} cursor={"default"}>
+      <Menu isOpen={true}>
+        <MenuItem
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            dispatch(deleteTasks());
+          }}
+        >
+          Delete
+        </MenuItem>
+        <MenuItem>Edit</MenuItem>
+      </Menu>
     </Box>
   );
 };
 
-const ContextMenu: FC = ({ children }) => {
+const ContextMenuWrapper: FC = ({ children }) => {
   const selected = useSelector(selectedTaskExists);
   const [position, setPosition] = useState<MenuPosition | null>(null);
 
@@ -56,10 +50,10 @@ const ContextMenu: FC = ({ children }) => {
         setPosition({ x: e.clientX, y: e.clientY });
       }}
     >
-      {position ? <Menu position={position} /> : null}
+      {position ? <ContextMenu position={position} /> : null}
       {children}
     </div>
   );
 };
 
-export default ContextMenu;
+export default ContextMenuWrapper;

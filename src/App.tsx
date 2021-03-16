@@ -1,6 +1,6 @@
 import { MouseEventHandler } from "react";
 import Board from "./components/Board";
-import ContextMenu from "./components/ContextMenu";
+import ContextMenuWrapper from "./components/ContextMenuWrapper";
 import RectangleSelection from "./components/RectangleSelection";
 import { useGapiAuth } from "./lib/GapiAuthProvider";
 
@@ -25,9 +25,9 @@ export default function App() {
 
   return (
     <RectangleSelection>
-      <ContextMenu>
+      <ContextMenuWrapper>
         <Board />
-      </ContextMenu>
+      </ContextMenuWrapper>
     </RectangleSelection>
   );
 }
