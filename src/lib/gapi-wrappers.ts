@@ -140,4 +140,14 @@ export async function getTasklists(): Promise<Tasklist[]> {
   return res.result.items;
 }
 
+function normalizeList<T extends { id: string }>(list: T[]) {
+  const allIds = list.map((item) => item.id);
+  const byId = new Map(list.map((item) => [item.id, item]));
+
+  return {
+    allIds,
+    byId,
+  };
+}
+
 export type { Task, Tasklist };
