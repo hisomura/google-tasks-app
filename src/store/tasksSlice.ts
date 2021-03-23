@@ -1,5 +1,6 @@
 import { createSlice, SliceCaseReducers } from "@reduxjs/toolkit";
 import { Task, Tasklist } from "../lib/gapi-wrappers";
+import { sortTasks } from "../lib/tasks";
 
 export type State = {
   entities: { [key: string]: Task };
@@ -9,8 +10,8 @@ export type State = {
   };
 };
 
-export const tasksSlice = createSlice<State, SliceCaseReducers<State>>({
-  name: "Tasks",
+const tasksSlice = createSlice<State, SliceCaseReducers<State>>({
+  name: "tasks",
   initialState: {
     idsMap: {},
     entities: {},
@@ -26,12 +27,8 @@ export const tasksSlice = createSlice<State, SliceCaseReducers<State>>({
       });
 
       taskIdsSet.forEach((tasklistId) => {
-        state.idsMap[tasklistId].sort((a, b) => {
-          if (a === b) {
-            return 0;
-          }
-          return a > b ? 1 : -1;
-        });
+        const sortedTasks = sortTasks(getTasksByTasklistId(state, tasklistId));
+        state.idsMap[tasklistId] = sortedTasks.map((task) => task.id);
       });
     },
   },
@@ -40,6 +37,9 @@ export const tasksSlice = createSlice<State, SliceCaseReducers<State>>({
 export const { addTasks } = tasksSlice.actions;
 
 export default tasksSlice.reducer;
+
+const getTasksByTasklistId = (state: State, tasklistId: string) =>
+  state.idsMap[tasklistId].map((taskId) => state.entities[taskId]);
 
 function pushId(list: State["idsMap"], listId: Tasklist["id"], id: Task["id"]) {
   if (list[listId] === undefined) list[listId] = [];
