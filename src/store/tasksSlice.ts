@@ -9,7 +9,7 @@ export type State = {
   };
 };
 
-export const TasksSlice = createSlice<State, SliceCaseReducers<State>>({
+export const tasksSlice = createSlice<State, SliceCaseReducers<State>>({
   name: "Tasks",
   initialState: {
     idsMap: {},
@@ -17,18 +17,29 @@ export const TasksSlice = createSlice<State, SliceCaseReducers<State>>({
   },
   reducers: {
     addTasks: (state, action: { payload: { tasks: Task[] } }) => {
+      let taskIdsSet = new Set<string>();
+
       action.payload.tasks.forEach((task) => {
         state.entities[task.id] = task;
         pushId(state.idsMap, task.tasklistId, task.id);
+        taskIdsSet.add(task.tasklistId);
       });
-      // TODO sort
+
+      taskIdsSet.forEach((tasklistId) => {
+        state.idsMap[tasklistId].sort((a, b) => {
+          if (a === b) {
+            return 0;
+          }
+          return a > b ? 1 : -1;
+        });
+      });
     },
   },
 });
 
-export const { addTask } = TasksSlice.actions;
+export const { addTasks } = tasksSlice.actions;
 
-export default TasksSlice.reducer;
+export default tasksSlice.reducer;
 
 function pushId(list: State["idsMap"], listId: Tasklist["id"], id: Task["id"]) {
   if (list[listId] === undefined) list[listId] = [];
