@@ -18,15 +18,15 @@ const tasksSlice = createSlice<State, SliceCaseReducers<State>>({
   },
   reducers: {
     addTasks: (state, action: { payload: { tasks: Task[] } }) => {
-      let taskIdsSet = new Set<string>();
+      let tasklistIdsSet = new Set<string>();
 
       action.payload.tasks.forEach((task) => {
         state.entities[task.id] = task;
         pushId(state.idsMap, task.tasklistId, task.id);
-        taskIdsSet.add(task.tasklistId);
+        tasklistIdsSet.add(task.tasklistId);
       });
 
-      taskIdsSet.forEach((tasklistId) => {
+      tasklistIdsSet.forEach((tasklistId) => {
         const sortedTasks = sortTasks(getTasksByTasklistId(state, tasklistId));
         state.idsMap[tasklistId] = sortedTasks.map((task) => task.id);
       });
