@@ -2,6 +2,7 @@ import React, { FC, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteTasks, selectedTaskExists } from "../store/selectedTaskIdsSlice";
 import { Box, Menu, MenuItem } from "@chakra-ui/react";
+import { AppDispatch } from "../store/store";
 
 const parentStyle: React.CSSProperties = {
   position: "relative",
@@ -15,7 +16,7 @@ type MenuPosition = {
 };
 
 const ContextMenu: FC<{ position: MenuPosition }> = ({ position }) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   return (
     <Box position={"absolute"} top={position.y} left={position.x} cursor={"default"}>
       <Menu isOpen={true}>

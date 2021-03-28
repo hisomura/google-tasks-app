@@ -3,13 +3,14 @@ import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useDispatch } from "react-redux";
 import { createTask, getTasks, Tasklist } from "../lib/gapi-wrappers";
 import { sortTasks } from "../lib/tasks";
+import { AppDispatch } from "../store/store";
 import { drop } from "../store/tasksDragSlice";
 import TaskContainer from "./TaskContainer";
 import TaskDragTargetLine from "./TaskDragTargetLine";
 
 const TasklistContainer: FC<{ tasklist: Tasklist }> = (props) => {
   const client = useQueryClient();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { isLoading, data } = useQuery(["tasks", props.tasklist.id], async () => {
     if (props.tasklist.id === undefined) return undefined;
     const tasks = await getTasks(props.tasklist.id);

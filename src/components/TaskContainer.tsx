@@ -2,6 +2,7 @@ import { FC, useState } from "react";
 import { completeTask, Task } from "../lib/gapi-wrappers";
 import { useMutation, useQueryClient } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "../store/store";
 import { dragEnd, dragStart, updateTarget, initTaskDragState } from "../store/tasksDragSlice";
 import CompleteButton from "./CompleteButton";
 import {
@@ -20,7 +21,7 @@ type Props = {
 
 const TaskContainer: FC<Props> = (props) => {
   const client = useQueryClient();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const [completed, setCompleted] = useState(false);
   const isSelected = useSelector(isSelectedSelector(props.task.id));
 

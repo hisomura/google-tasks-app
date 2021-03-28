@@ -1,6 +1,7 @@
 import React, { FC, useState } from "react";
 import { useDispatch } from "react-redux";
 import { replaceAllTaskIds } from "../store/selectedTaskIdsSlice";
+import { AppDispatch } from "../store/store";
 
 const parentStyle: React.CSSProperties = {
   position: "relative",
@@ -38,7 +39,7 @@ function getRectangleVertexes(state: RectangleState) {
 
 const RectangleSelection: FC = ({ children }) => {
   const [rectangleState, setRectangleState] = useState<RectangleState | null>(null);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   return (
     <div
       draggable={false}
