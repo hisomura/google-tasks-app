@@ -11,32 +11,22 @@ const Div = styled.div`
     position: absolute;
     top: 0;
     left: 0;
-
-    &:nth-child(1) {
-      visibility: visible;
-    }
-
-    &:nth-child(2) {
-      visibility: hidden;
-    }
   }
 
   &:hover svg {
-    &:nth-child(1) {
-      visibility: hidden;
-    }
-
-    &:nth-child(2) {
-      visibility: visible;
-    }
+    transform: scale(1.3);
   }
 `;
 
-const CompleteButton: FC<{ onClick: MouseEventHandler<HTMLDivElement> }> = (props) => {
+type Props = {
+  completed: boolean;
+  onClick: MouseEventHandler<HTMLDivElement>;
+};
+
+const CompleteButton: FC<Props> = (props) => {
   return (
     <Div onClick={props.onClick} onMouseUp={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
-      <MdPanoramaFishEye />
-      <MdDone />
+      {props.completed ? <MdDone /> : <MdPanoramaFishEye />}
     </Div>
   );
 };
