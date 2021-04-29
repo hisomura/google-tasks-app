@@ -70,6 +70,7 @@ const TaskContainer: FC<Props> = (props) => {
       <div className="flex items-center p-3">
         <div className={"flex-initial mr-3" + (props.task.parent ? " ml-3" : "")}>
           <CompleteButton
+            completed={completed}
             onClick={(e) => {
               e.stopPropagation();
               setCompleted(true);
