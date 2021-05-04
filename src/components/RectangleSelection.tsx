@@ -37,6 +37,23 @@ function getRectangleVertexes(state: RectangleState) {
   return { left, right, top, bottom };
 }
 
+function checkIfTaskIsSelected(rectangleState: RectangleState, domRect: DOMRect) {
+  const rectangleVertexes = getRectangleVertexes(rectangleState);
+  const rectCenterX = (domRect.left + domRect.right) / 2;
+  const rectCenterY = (domRect.top + domRect.bottom) / 2;
+
+  if (
+    rectangleVertexes.left <= rectCenterX &&
+    rectCenterX <= rectangleVertexes.right &&
+    rectangleVertexes.top < rectCenterY &&
+    rectCenterY < rectangleVertexes.bottom
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
 const RectangleSelection: FC = ({ children }) => {
   const [rectangleState, setRectangleState] = useState<RectangleState | null>(null);
   const dispatch = useDispatch<AppDispatch>();
@@ -62,17 +79,11 @@ const RectangleSelection: FC = ({ children }) => {
         if (!rectangleState) return;
         const taskNodeList = document.querySelectorAll<HTMLDivElement>(".task-container");
         if (taskNodeList.length === 0) return;
-        const rectangleVertexes = getRectangleVertexes(rectangleState);
         const taskIds: string[] = [];
 
         taskNodeList.forEach((taskNode) => {
           const rect = taskNode.getBoundingClientRect();
-          if (
-            rectangleVertexes.left <= rect.left &&
-            rect.right <= rectangleVertexes.right &&
-            rectangleVertexes.top < rect.top &&
-            rect.bottom < rectangleVertexes.bottom
-          ) {
+          if (checkIfTaskIsSelected(rectangleState, rect)) {
             taskIds.push(taskNode.dataset["taskId"]!);
           }
         });
