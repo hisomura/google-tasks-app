@@ -73,22 +73,22 @@ const RectangleSelection: FC = ({ children }) => {
       onMouseMove={(e) => {
         if (rectangleState === null) return;
 
-        setRectangleState({ ...rectangleState, currentX: e.clientX, currentY: e.clientY });
-      }}
-      onMouseUp={(_e) => {
-        if (!rectangleState) return;
+        setRectangleState((prev) => {
+          if (!prev) throw new Error("prev is null");
+          return { ...prev, currentX: e.clientX, currentY: e.clientY };
+        });
+
         const taskNodeList = document.querySelectorAll<HTMLDivElement>(".task-container");
         if (taskNodeList.length === 0) return;
         const taskIds: string[] = [];
-
         taskNodeList.forEach((taskNode) => {
-          const rect = taskNode.getBoundingClientRect();
-          if (checkIfTaskIsSelected(rectangleState, rect)) {
+          if (checkIfTaskIsSelected(rectangleState, taskNode.getBoundingClientRect())) {
             taskIds.push(taskNode.dataset["taskId"]!);
           }
         });
-
         dispatch(replaceAllTaskIds(taskIds));
+      }}
+      onMouseUp={(_e) => {
         setRectangleState(null);
       }}
     >
